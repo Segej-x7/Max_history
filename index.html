@@ -1,0 +1,800 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+<meta name="theme-color" content="#3498db">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Исторические даты</title>
+	<link rel="manifest" href="./manifest.json">
+    <link rel="icon" type="image/png" href="./Zastavka.png">
+    <link rel="apple-touch-icon" href="./Zastavka.png">
+    <style>
+        :root {
+            --primary-color: #2a6d5d;
+            --secondary-color: #4a8c7c;
+            --accent-color: #6baa9a;
+            --bg-color: #f0f5f3;
+            --card-color: #ffffff;
+            --text-color: #2a3a35;
+            --correct-color: #27ae60;
+            --incorrect-color: #e74c3c;
+            --border-radius: 12px;
+            --shadow: 0 4px 12px rgba(42, 109, 93, 0.2);
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+        
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            padding: 16px;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+        
+        .container {
+            background-color: var(--card-color);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 24px;
+        }
+        
+        h1 {
+            color: var(--primary-color);
+            font-size: 1.5rem;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+        
+        .subtitle {
+            color: var(--text-color);
+            opacity: 0.8;
+            font-size: 0.95rem;
+        }
+        
+        .tabs {
+            display: flex;
+            margin-bottom: 20px;
+            background-color: var(--bg-color);
+            border-radius: var(--border-radius);
+            padding: 4px;
+        }
+        
+        .tab {
+            flex: 1;
+            padding: 12px;
+            text-align: center;
+            background: none;
+            border: none;
+            border-radius: 8px;
+            font-weight: 500;
+            cursor: pointer;
+            color: var(--text-color);
+            opacity: 0.7;
+            transition: all 0.3s ease;
+        }
+        
+        .tab.active {
+            background-color: var(--primary-color);
+            color: white;
+            opacity: 1;
+        }
+        
+        .stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+        
+        .stat-item {
+            background-color: var(--bg-color);
+            padding: 12px;
+            border-radius: var(--border-radius);
+            text-align: center;
+        }
+        
+        .stat-value {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--primary-color);
+        }
+        
+        .stat-label {
+            font-size: 0.85rem;
+            opacity: 0.8;
+            margin-top: 4px;
+        }
+        
+        .progress-container {
+            margin-bottom: 20px;
+        }
+        
+        .progress-bar {
+            height: 6px;
+            background-color: var(--bg-color);
+            border-radius: 3px;
+            overflow: hidden;
+            margin-bottom: 8px;
+        }
+        
+        .progress {
+            height: 100%;
+            background-color: var(--secondary-color);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+        
+        .progress-text {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.85rem;
+            color: var(--text-color);
+            opacity: 0.8;
+        }
+        
+        .card {
+            background-color: var(--card-color);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            padding: 20px;
+            margin-bottom: 16px;
+        }
+        
+        .card-question {
+            font-size: 1.3rem;
+            margin-bottom: 20px;
+            text-align: center;
+            font-weight: 500;
+            line-height: 1.4;
+            min-height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .input-container {
+            margin-bottom: 20px;
+        }
+        
+        .date-input {
+            width: 100%;
+            padding: 16px;
+            border: 2px solid var(--accent-color);
+            border-radius: var(--border-radius);
+            font-size: 1rem;
+            background-color: var(--card-color);
+            color: var(--text-color);
+            margin-bottom: 8px;
+        }
+        
+        .date-input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+        }
+        
+        .hint {
+            font-size: 0.85rem;
+            color: var(--text-color);
+            opacity: 0.7;
+            text-align: center;
+        }
+        
+        .result-message {
+            padding: 12px;
+            border-radius: var(--border-radius);
+            margin-bottom: 16px;
+            text-align: center;
+            font-weight: 500;
+            display: none;
+        }
+        
+        .result-correct {
+            background-color: rgba(39, 174, 96, 0.1);
+            color: var(--correct-color);
+            border: 1px solid var(--correct-color);
+        }
+        
+        .result-incorrect {
+            background-color: rgba(231, 76, 60, 0.1);
+            color: var(--incorrect-color);
+            border: 1px solid var(--incorrect-color);
+        }
+        
+        .correct-answer {
+            background-color: var(--bg-color);
+            padding: 16px;
+            border-radius: var(--border-radius);
+            margin-bottom: 16px;
+            font-size: 1.1rem;
+            text-align: center;
+            color: var(--primary-color);
+            font-weight: 500;
+            display: none;
+        }
+        
+        .buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+        
+        .btn {
+            padding: 16px;
+            border: none;
+            border-radius: var(--border-radius);
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background-color: var(--secondary-color);
+        }
+        
+        .btn-secondary {
+            background-color: var(--accent-color);
+            color: white;
+        }
+        
+        .btn-secondary:hover {
+            background-color: var(--secondary-color);
+        }
+        
+        .hidden {
+            display: none;
+        }
+        
+        .preview-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+        
+        .preview-item {
+            background-color: var(--bg-color);
+            padding: 16px;
+            border-radius: var(--border-radius);
+            border-left: 4px solid var(--accent-color);
+        }
+        
+        .preview-question {
+            font-weight: 500;
+            margin-bottom: 8px;
+            color: var(--text-color);
+        }
+        
+        .preview-answer {
+            color: var(--primary-color);
+            font-weight: 500;
+        }
+        
+        .history-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 16px;
+        }
+        
+        .history-table th,
+        .history-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid var(--bg-color);
+        }
+        
+        .history-table th {
+            background-color: var(--bg-color);
+            font-weight: 600;
+            color: var(--primary-color);
+        }
+        
+        .history-table tr:last-child td {
+            border-bottom: none;
+        }
+        
+        .correct-count {
+            color: var(--correct-color);
+            font-weight: 600;
+        }
+        
+        .incorrect-count {
+            color: var(--incorrect-color);
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Исторические даты</h1>
+            <p class="subtitle">Изучайте и повторяйте</p>
+        </header>
+        
+        <div class="tabs">
+            <button class="tab active" data-tab="preview">Просмотр дат</button>
+            <button class="tab" data-tab="test">Проверка</button>
+            <button class="tab" data-tab="stats">Статистика</button>
+        </div>
+        
+        <!-- Вкладка предварительного просмотра -->
+        <div id="preview-tab">
+            <div class="stats">
+                <div class="stat-item">
+                    <div class="stat-value" id="total-cards">0</div>
+                    <div class="stat-label">Всего</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="mastered-cards">0</div>
+                    <div class="stat-label">Выучено</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="current-score">0</div>
+                    <div class="stat-label">Баллы</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="due-today">0</div>
+                    <div class="stat-label">На сегодня</div>
+                </div>
+            </div>
+            
+            <div class="card">
+                <h3 style="text-align: center; margin-bottom: 16px; color: var(--primary-color);">Повторите даты:</h3>
+                <div class="preview-list" id="preview-list">
+                    <!-- Список вопросов-ответов будет здесь -->
+                </div>
+                <button class="btn btn-primary" id="start-test-btn">Начать проверку</button>
+            </div>
+        </div>
+        
+        <!-- Вкладка проверки знаний -->
+        <div id="test-tab" class="hidden">
+            <div class="progress-container">
+                <div class="progress-bar">
+                    <div class="progress" id="progress"></div>
+                </div>
+                <div class="progress-text">
+                    <span>Прогресс</span>
+                    <span id="progress-text">0/0</span>
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="card-question" id="test-question">
+                    Загрузка вопросов...
+                </div>
+                <div class="input-container">
+                    <input type="text" class="date-input" id="date-input" placeholder="Введите дату...">
+                    <div class="hint">Например: 1917, 1917 г., 7 ноября 1917 г.</div>
+                </div>
+                
+                <div class="result-message" id="result-message"></div>
+                <div class="correct-answer" id="correct-answer"></div>
+                
+                <div class="buttons">
+                    <button class="btn btn-primary" id="check-answer-btn">Проверить</button>
+                    <button class="btn btn-secondary" id="next-question-btn" style="display: none;">Следующий вопрос</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Вкладка статистики -->
+        <div id="stats-tab" class="hidden">
+            <div class="card">
+                <h3 style="text-align: center; margin-bottom: 20px; color: var(--primary-color);">Статистика по дням</h3>
+                <div class="history-table-container">
+                    <table class="history-table">
+                        <thead>
+                            <tr>
+                                <th>Дата</th>
+                                <th>Всего</th>
+                                <th>Правильно</th>
+                                <th>Неправильно</th>
+                            </tr>
+                        </thead>
+                        <tbody id="history-table-body">
+                            <!-- Данные будут загружены через JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // База данных карточек по умолчанию
+        const defaultCards = [
+            { "question": "Октябрьская революция", "answer": "7 ноября 1917 г." },
+            { "question": "Начало Второй мировой войны", "answer": "1 сентября 1939 г." },
+            { "question": "Крещение Руси", "answer": "988 г." },
+            { "question": "Великая французская революция", "answer": "1789 г." },
+            { "question": "Куликовская битва", "answer": "8 сентября 1380 г." },
+            { "question": "Отмена крепостного права", "answer": "19 февраля 1861 г." },
+            { "question": "Открытие Америки Колумбом", "answer": "12 октября 1492 г." },
+            { "question": "Бородинское сражение", "answer": "7 сентября 1812 г." },
+            { "question": "Падение Берлинской стены", "answer": "9 ноября 1989 г." },
+            { "question": "Распад СССР", "answer": "26 декабря 1991 г." }
+        ];
+
+        // Элементы DOM
+        const tabs = document.querySelectorAll('.tab');
+        const previewTab = document.getElementById('preview-tab');
+        const testTab = document.getElementById('test-tab');
+        const statsTab = document.getElementById('stats-tab');
+        const startTestBtn = document.getElementById('start-test-btn');
+        const checkAnswerBtn = document.getElementById('check-answer-btn');
+        const nextQuestionBtn = document.getElementById('next-question-btn');
+        const dateInput = document.getElementById('date-input');
+        const resultMessage = document.getElementById('result-message');
+        const correctAnswer = document.getElementById('correct-answer');
+        const previewList = document.getElementById('preview-list');
+        const historyTableBody = document.getElementById('history-table-body');
+
+        // Статистические элементы
+        const totalCardsEl = document.getElementById('total-cards');
+        const masteredCardsEl = document.getElementById('mastered-cards');
+        const currentScoreEl = document.getElementById('current-score');
+        const dueTodayEl = document.getElementById('due-today');
+        const progressEl = document.getElementById('progress');
+        const progressText = document.getElementById('progress-text');
+
+        // Элементы карточек
+        const testQuestion = document.getElementById('test-question');
+
+        // Переменные состояния
+        let currentCardIndex = 0;
+        let sessionCards = [];
+        let userStats = {
+            totalCards: 0,
+            masteredCards: 0,
+            currentScore: 0,
+            dueToday: 0,
+            studyHistory: []
+        };
+
+        // Загрузка данных
+        async function loadData() {
+            let cardsDatabase = [];
+            
+            // Пытаемся загрузить вопросы из JSON файла
+            try {
+                const response = await fetch('questions.json');
+                if (response.ok) {
+                    const data = await response.json();
+                    cardsDatabase = data.questions;
+                } else {
+                    throw new Error('Файл не найден');
+                }
+            } catch (error) {
+                console.log('Используем встроенные вопросы:', error);
+                cardsDatabase = defaultCards;
+            }
+            
+            const savedCards = localStorage.getItem('historyCards');
+            const savedStats = localStorage.getItem('historyStats');
+            
+            if (savedCards) {
+                sessionCards = JSON.parse(savedCards);
+                // Обновляем вопросы из базы данных
+                sessionCards.forEach(card => {
+                    const dbCard = cardsDatabase.find(c => c.question === card.question);
+                    if (dbCard) {
+                        card.answer = dbCard.answer;
+                    }
+                });
+            } else {
+                // Инициализация карточек
+                sessionCards = cardsDatabase.map((card, index) => ({
+                    id: index + 1,
+                    question: card.question,
+                    answer: card.answer,
+                    score: 0,
+                    lastReviewed: null,
+                    nextReview: new Date()
+                }));
+                saveCards();
+            }
+            
+            if (savedStats) {
+                userStats = JSON.parse(savedStats);
+            }
+            
+            updateStats();
+            updateHistoryTable();
+            initSession();
+        }
+
+        // Сохранение данных
+        function saveCards() {
+            localStorage.setItem('historyCards', JSON.stringify(sessionCards));
+        }
+
+        function saveStats() {
+            localStorage.setItem('historyStats', JSON.stringify(userStats));
+        }
+
+        // Обновление статистики
+        function updateStats() {
+            const now = new Date();
+            const dueCards = sessionCards.filter(card => 
+                !card.nextReview || new Date(card.nextReview) <= now
+            );
+            
+            const masteredCards = sessionCards.filter(card => card.score >= 15).length;
+            const totalScore = sessionCards.reduce((sum, card) => sum + card.score, 0);
+            
+            userStats.totalCards = sessionCards.length;
+            userStats.masteredCards = masteredCards;
+            userStats.currentScore = totalScore;
+            userStats.dueToday = dueCards.length;
+            
+            totalCardsEl.textContent = userStats.totalCards;
+            masteredCardsEl.textContent = userStats.masteredCards;
+            currentScoreEl.textContent = userStats.currentScore;
+            dueTodayEl.textContent = userStats.dueToday;
+            
+            saveStats();
+        }
+
+        // Обновление таблицы истории
+        function updateHistoryTable() {
+            historyTableBody.innerHTML = '';
+            
+            if (userStats.studyHistory.length === 0) {
+                historyTableBody.innerHTML = `
+                    <tr>
+                        <td colspan="4" style="text-align: center; padding: 20px;">
+                            Пока нет данных о занятиях
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+            
+            // Сортируем от новых к старым
+            const sortedHistory = [...userStats.studyHistory].sort((a, b) => 
+                new Date(b.date) - new Date(a.date)
+            );
+            
+            sortedHistory.forEach(session => {
+                const date = new Date(session.date);
+                const formattedDate = date.toLocaleDateString('ru-RU');
+                
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${formattedDate}</td>
+                    <td>${session.totalQuestions}</td>
+                    <td class="correct-count">${session.correctAnswers}</td>
+                    <td class="incorrect-count">${session.incorrectAnswers}</td>
+                `;
+                historyTableBody.appendChild(row);
+            });
+        }
+
+        // Добавление записи в историю
+        function addStudySession(totalQuestions, correctAnswers, incorrectAnswers) {
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            
+            const existingSessionIndex = userStats.studyHistory.findIndex(session => {
+                const sessionDate = new Date(session.date);
+                sessionDate.setHours(0, 0, 0, 0);
+                return sessionDate.getTime() === today.getTime();
+            });
+            
+            if (existingSessionIndex !== -1) {
+                userStats.studyHistory[existingSessionIndex] = {
+                    date: today,
+                    totalQuestions,
+                    correctAnswers,
+                    incorrectAnswers
+                };
+            } else {
+                userStats.studyHistory.push({
+                    date: today,
+                    totalQuestions,
+                    correctAnswers,
+                    incorrectAnswers
+                });
+            }
+            
+            saveStats();
+            updateHistoryTable();
+        }
+
+        // Инициализация сессии
+        function initSession() {
+            const now = new Date();
+            let dueCards = sessionCards.filter(card => 
+                !card.nextReview || new Date(card.nextReview) <= now
+            );
+            
+            // Если все карточки имеют 15 баллов, обнуляем их и берем больше карточек
+            if (dueCards.length === 0 && sessionCards.every(card => card.score >= 15)) {
+                sessionCards.forEach(card => {
+                    card.score = 0;
+                    card.nextReview = new Date();
+                });
+                dueCards = sessionCards.slice(0, 20);
+                saveCards();
+            }
+            
+            if (dueCards.length === 0) {
+                dueCards = sessionCards.filter(card => card.score === 0).slice(0, 10);
+            }
+            
+            sessionCards = dueCards;
+            currentCardIndex = 0;
+            
+            updatePreviewList();
+        }
+
+        // Обновление списка предпросмотра
+        function updatePreviewList() {
+            previewList.innerHTML = '';
+            
+            if (sessionCards.length === 0) {
+                previewList.innerHTML = '<div style="text-align: center; padding: 20px; color: var(--text-color); opacity: 0.7;">Нет карточек для изучения</div>';
+                return;
+            }
+            
+            sessionCards.forEach(card => {
+                const item = document.createElement('div');
+                item.className = 'preview-item';
+                item.innerHTML = `
+                    <div class="preview-question">${card.question}</div>
+                    <div class="preview-answer">${card.answer}</div>
+                `;
+                previewList.appendChild(item);
+            });
+        }
+
+        // Показать карточку для тестирования
+        function showTestCard() {
+            if (currentCardIndex >= sessionCards.length) {
+                // Завершаем сессию и добавляем в историю
+                const correctAnswers = sessionCards.filter(card => card.score > 0).length;
+                const incorrectAnswers = sessionCards.length - correctAnswers;
+                addStudySession(sessionCards.length, correctAnswers, incorrectAnswers);
+                
+                // Переходим на вкладку просмотра
+                tabs[0].click();
+                initSession();
+                return;
+            }
+            
+            const card = sessionCards[currentCardIndex];
+            testQuestion.textContent = card.question;
+            
+            dateInput.value = '';
+            dateInput.focus();
+            resultMessage.style.display = 'none';
+            correctAnswer.style.display = 'none';
+            checkAnswerBtn.style.display = 'block';
+            nextQuestionBtn.style.display = 'none';
+            
+            updateProgress();
+        }
+
+        // Проверка ответа
+        function checkAnswer() {
+            const card = sessionCards[currentCardIndex];
+            const userAnswer = dateInput.value.trim();
+            const isCorrect = checkDateAnswer(userAnswer, card.answer);
+            
+            resultMessage.style.display = 'block';
+            resultMessage.className = `result-message ${isCorrect ? 'result-correct' : 'result-incorrect'}`;
+            resultMessage.textContent = isCorrect ? '✓ Правильно!' : '✗ Неправильно!';
+            
+            if (!isCorrect) {
+                correctAnswer.textContent = `Правильный ответ: ${card.answer}`;
+                correctAnswer.style.display = 'block';
+            }
+            
+            // Обновляем баллы карточки
+            if (isCorrect) {
+                card.score = Math.min(15, card.score + 1);
+            } else {
+                card.score = 0;
+            }
+            
+            // Устанавливаем следующее повторение
+            const now = new Date();
+            const nextDate = new Date(now);
+            nextDate.setDate(nextDate.getDate() + (isCorrect ? 3 : 1));
+            card.nextReview = nextDate;
+            card.lastReviewed = now;
+            
+            saveCards();
+            updateStats();
+            
+            checkAnswerBtn.style.display = 'none';
+            nextQuestionBtn.style.display = 'block';
+        }
+
+        // Переход к следующему вопросу
+        function nextQuestion() {
+            currentCardIndex++;
+            showTestCard();
+        }
+
+        // Проверка даты
+        function checkDateAnswer(userAnswer, correctAnswer) {
+            const userYear = userAnswer.match(/\b(\d{4})\b/);
+            const correctYear = correctAnswer.match(/\b(\d{4})\b/);
+            
+            return userYear && correctYear && userYear[1] === correctYear[1];
+        }
+
+        // Обновление прогресса
+        function updateProgress() {
+            const progress = ((currentCardIndex) / sessionCards.length) * 100;
+            progressEl.style.width = `${progress}%`;
+            progressText.textContent = `${currentCardIndex}/${sessionCards.length}`;
+        }
+
+        // Инициализация приложения
+        function init() {
+            // Обработчики вкладок
+            tabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    const tabName = tab.dataset.tab;
+                    
+                    tabs.forEach(t => t.classList.remove('active'));
+                    tab.classList.add('active');
+                    
+                    previewTab.classList.toggle('hidden', tabName !== 'preview');
+                    testTab.classList.toggle('hidden', tabName !== 'test');
+                    statsTab.classList.toggle('hidden', tabName !== 'stats');
+                    
+                    if (tabName === 'test') {
+                        currentCardIndex = 0;
+                        showTestCard();
+                    }
+                });
+            });
+
+            // Обработчики кнопок
+            startTestBtn.addEventListener('click', () => {
+                tabs[1].click();
+            });
+            
+            checkAnswerBtn.addEventListener('click', checkAnswer);
+            nextQuestionBtn.addEventListener('click', nextQuestion);
+            
+            dateInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    checkAnswer();
+                }
+            });
+            
+            // Загрузка данных
+            loadData();
+        }
+
+        // Запуск приложения
+        init();
+    </script>
+</body>
+</html>

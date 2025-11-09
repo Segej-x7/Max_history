@@ -1,0 +1,23 @@
+{
+  "name": "Учет аренды",
+  "short_name": "Аренда",
+  "description": "Приложение для учета аренды и коммунальных платежей",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#3498db",
+  "theme_color": "#3498db",
+  "orientation": "portrait",
+  "scope": "./",
+  "icons": [
+    {
+      "src": "./Zastavka.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "./Zastavka.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
