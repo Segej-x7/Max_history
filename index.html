@@ -448,7 +448,7 @@
                 </div>
                 <div class="input-container">
                     <input type="text" class="date-input" id="date-input" placeholder="Введите дату...">
-                    <div class="hint">Например: 1917, 1917 г., 7 ноября 1917 г.</div>
+                    <div class="hint">Например: 862, 862 г., 882 год</div>
                 </div>
                 
                 <div class="result-message" id="result-message"></div>
@@ -487,26 +487,13 @@
     <script>
         // База данных карточек по умолчанию
         const defaultCards = [
-            { "question": "Октябрьская революция", "answer": "7 ноября 1917 г." },
-            { "question": "Начало Второй мировой войны", "answer": "1 сентября 1939 г." },
-            { "question": "Крещение Руси", "answer": "988 г." },
-            { "question": "Великая французская революция", "answer": "1789 г." },
-            { "question": "Куликовская битва", "answer": "8 сентября 1380 г." },
-            { "question": "Отмена крепостного права", "answer": "19 февраля 1861 г." },
-            { "question": "Открытие Америки Колумбом", "answer": "12 октября 1492 г." },
-            { "question": "Бородинское сражение", "answer": "7 сентября 1812 г." },
-            { "question": "Падение Берлинской стены", "answer": "9 ноября 1989 г." },
-            { "question": "Распад СССР", "answer": "26 декабря 1991 г." },
-            { "question": "Ледовое побоище", "answer": "5 апреля 1242 г." },
-            { "question": "Восстание декабристов", "answer": "14 декабря 1825 г." },
-            { "question": "Первая мировая война", "answer": "28 июля 1914 г." },
-            { "question": "Гражданская война в США", "answer": "12 апреля 1861 г." },
-            { "question": "Великая Отечественная война", "answer": "22 июня 1941 г." },
-            { "question": "Революция 1905 года", "answer": "9 января 1905 г." },
-            { "question": "Варфоломеевская ночь", "answer": "24 августа 1572 г." },
-            { "question": "Взятие Бастилии", "answer": "14 июля 1789 г." },
-            { "question": "Битва при Ватерлоо", "answer": "18 июня 1815 г." },
-            { "question": "Холодная война", "answer": "1947 г." }
+            { "question": "«Призвание» варягов", "answer": "862" },
+            { "question": "Образование Древнерусского государства", "answer": "882" },
+            { "question": "Поход Олега на Константинополь", "answer": "907" },
+            { "question": "Первый договор Руси с Византией", "answer": "911" },
+            { "question": "Начало правления князя Игоря", "answer": "912" },
+            { "question": "Конец правления князя Игоря", "answer": "945" },
+            { "question": "Период политической раздробленности Руси", "answer": "ХII – ХV вв" }
         ];
 
         // Элементы DOM
@@ -560,6 +547,64 @@
             return blocks;
         }
 
+        // Улучшенная функция проверки ответа
+        function checkDateAnswer(userAnswer, correctAnswer) {
+            if (!userAnswer || !correctAnswer) return false;
+            
+            // Очищаем ответы от лишних символов и приводим к нижнему регистру
+            const cleanUserAnswer = userAnswer.toString().trim().toLowerCase()
+                .replace(/[.,]/g, '') // Убираем точки и запятые
+                .replace(/\s+/g, ' ') // Заменяем множественные пробелы на один
+                .replace(/\s*г\s*$/, '') // Убираем "г" в конце
+                .replace(/\s*год\s*$/, '') // Убираем "год" в конце
+                .replace(/\s*года\s*$/, '') // Убираем "года" в конце
+                .replace(/\s*вв\s*$/, ' вв') // Стандартизируем "вв"
+                .replace(/х/g, 'x') // Заменяем кириллические "х" на латинские "x"
+                .trim();
+            
+            const cleanCorrectAnswer = correctAnswer.toString().trim().toLowerCase()
+                .replace(/[.,]/g, '')
+                .replace(/\s+/g, ' ')
+                .replace(/\s*г\s*$/, '')
+                .replace(/\s*год\s*$/, '')
+                .replace(/\s*года\s*$/, '')
+                .replace(/\s*вв\s*$/, ' вв')
+                .replace(/х/g, 'x')
+                .trim();
+            
+            console.log('Пользователь ввел:', cleanUserAnswer);
+            console.log('Правильный ответ:', cleanCorrectAnswer);
+            
+            // Проверяем точное совпадение
+            if (cleanUserAnswer === cleanCorrectAnswer) {
+                return true;
+            }
+            
+            // Для числовых ответов проверяем совпадение чисел
+            const userNumbers = cleanUserAnswer.match(/\d+/g);
+            const correctNumbers = cleanCorrectAnswer.match(/\d+/g);
+            
+            if (userNumbers && correctNumbers) {
+                // Проверяем все числа в ответе
+                if (userNumbers.length === correctNumbers.length) {
+                    return userNumbers.every((num, index) => num === correctNumbers[index]);
+                }
+            }
+            
+            // Для римских цифр и временных периодов
+            if (cleanCorrectAnswer.includes('x') || cleanCorrectAnswer.includes('вв')) {
+                // Упрощенная проверка для периодов типа "xii - xv вв"
+                const normalizedUser = cleanUserAnswer.replace(/\s*–\s*/g, '-').replace(/\s*-\s*/g, '-');
+                const normalizedCorrect = cleanCorrectAnswer.replace(/\s*–\s*/g, '-').replace(/\s*-\s*/g, '-');
+                
+                if (normalizedUser === normalizedCorrect) {
+                    return true;
+                }
+            }
+            
+            return false;
+        }
+
         // Загрузка данных
         async function loadData() {
             let cardsDatabase = [];
@@ -570,6 +615,7 @@
                 if (response.ok) {
                     const data = await response.json();
                     cardsDatabase = data.questions;
+                    console.log('Загружены вопросы из JSON:', cardsDatabase);
                 } else {
                     throw new Error('Файл не найден');
                 }
@@ -859,14 +905,6 @@
         function nextQuestion() {
             currentCardIndex++;
             showTestCard();
-        }
-
-        // Проверка даты
-        function checkDateAnswer(userAnswer, correctAnswer) {
-            const userYear = userAnswer.match(/\b(\d{4})\b/);
-            const correctYear = correctAnswer.match(/\b(\d{4})\b/);
-            
-            return userYear && correctYear && userYear[1] === correctYear[1];
         }
 
         // Обновление прогресса
