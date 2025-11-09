@@ -302,32 +302,6 @@
             font-weight: 500;
         }
         
-        .block-navigation {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 16px;
-        }
-        
-        .block-btn {
-            padding: 12px 20px;
-            border: none;
-            border-radius: var(--border-radius);
-            background-color: var(--accent-color);
-            color: white;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.2s ease;
-        }
-        
-        .block-btn:hover {
-            background-color: var(--secondary-color);
-        }
-        
-        .block-btn:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-        
         .history-table-container {
             overflow-x: auto;
             margin-top: 16px;
@@ -376,6 +350,17 @@
             opacity: 0.7;
             font-style: italic;
         }
+        
+        .score-badge {
+            display: inline-block;
+            padding: 4px 8px;
+            background-color: var(--primary-color);
+            color: white;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            margin-left: 8px;
+        }
     </style>
 </head>
 <body>
@@ -414,15 +399,12 @@
             
             <div class="card">
                 <div class="block-info" id="block-info">
-                    Блок 1 из 1 (1-10 вопросы)
+                    Текущий блок для изучения
                 </div>
                 
-                <div class="block-navigation">
-                    <button class="block-btn" id="prev-block-btn" disabled>← Предыдущий</button>
-                    <button class="block-btn" id="next-block-btn">Следующий →</button>
-                </div>
-                
-                <h3 style="text-align: center; margin-bottom: 16px; color: var(--primary-color);">Текущие даты для повторения:</h3>
+                <h3 style="text-align: center; margin-bottom: 16px; color: var(--primary-color);">
+                    Вопросы с наименьшими баллами:
+                </h3>
                 <div class="preview-list" id="preview-list">
                     <!-- Список вопросов-ответов будет здесь -->
                 </div>
@@ -493,7 +475,15 @@
             { "question": "Первый договор Руси с Византией", "answer": "911" },
             { "question": "Начало правления князя Игоря", "answer": "912" },
             { "question": "Конец правления князя Игоря", "answer": "945" },
-            { "question": "Период политической раздробленности Руси", "answer": "ХII – ХV вв" }
+            { "question": "Период политической раздробленности Руси", "answer": "ХII – ХV вв" },
+            { "question": "Любечский съезд князей", "answer": "1097" },
+            { "question": "Битва на Калке", "answer": "1223" },
+            { "question": "Начало монголо-татарского ига", "answer": "1240" },
+            { "question": "Куликовская битва", "answer": "1380" },
+            { "question": "Стояние на Угре", "answer": "1480" },
+            { "question": "Принятие Судебника Ивана III", "answer": "1497" },
+            { "question": "Венчание Ивана IV на царство", "answer": "1547" },
+            { "question": "Стоглавый собор", "answer": "1551" }
         ];
 
         // Элементы DOM
@@ -510,8 +500,6 @@
         const previewList = document.getElementById('preview-list');
         const historyTableBody = document.getElementById('history-table-body');
         const blockInfo = document.getElementById('block-info');
-        const prevBlockBtn = document.getElementById('prev-block-btn');
-        const nextBlockBtn = document.getElementById('next-block-btn');
 
         // Статистические элементы
         const totalCardsEl = document.getElementById('total-cards');
@@ -526,10 +514,8 @@
 
         // Переменные состояния
         let currentCardIndex = 0;
-        let currentBlockIndex = 0;
         let sessionCards = [];
         let allCards = [];
-        let blocks = [];
         let userStats = {
             totalCards: 0,
             masteredCards: 0,
@@ -538,13 +524,35 @@
             studyHistory: []
         };
 
-        // Разделение карточек на блоки по 10
-        function createBlocks(cards) {
-            const blocks = [];
-            for (let i = 0; i < cards.length; i += 10) {
-                blocks.push(cards.slice(i, i + 10));
+        // Создание текущего блока из вопросов с наименьшими баллами
+        function createCurrentBlock() {
+            const now = new Date();
+            
+            // Фильтруем карточки, которые готовы к повторению
+            let availableCards = allCards.filter(card => 
+                !card.nextReview || new Date(card.nextReview) <= now
+            );
+            
+            // Если все карточки имеют 15 баллов, обнуляем их
+            if (availableCards.length === 0 && allCards.every(card => card.score >= 15)) {
+                allCards.forEach(card => {
+                    card.score = 0;
+                    card.nextReview = new Date();
+                });
+                availableCards = [...allCards];
+                saveCards();
             }
-            return blocks;
+            
+            // Если нет доступных карточек, берем новые (с баллом 0)
+            if (availableCards.length === 0) {
+                availableCards = allCards.filter(card => card.score === 0);
+            }
+            
+            // Сортируем по баллам (от меньшего к большему)
+            availableCards.sort((a, b) => a.score - b.score);
+            
+            // Берем первые 10 карточек (с наименьшими баллами)
+            return availableCards.slice(0, 10);
         }
 
         // Улучшенная функция проверки ответа
@@ -560,6 +568,7 @@
                 .replace(/\s*года\s*$/, '') // Убираем "года" в конце
                 .replace(/\s*вв\s*$/, ' вв') // Стандартизируем "вв"
                 .replace(/х/g, 'x') // Заменяем кириллические "х" на латинские "x"
+                .replace(/–/g, '-') // Заменяем длинное тире на дефис
                 .trim();
             
             const cleanCorrectAnswer = correctAnswer.toString().trim().toLowerCase()
@@ -570,6 +579,7 @@
                 .replace(/\s*года\s*$/, '')
                 .replace(/\s*вв\s*$/, ' вв')
                 .replace(/х/g, 'x')
+                .replace(/–/g, '-')
                 .trim();
             
             console.log('Пользователь ввел:', cleanUserAnswer);
@@ -645,14 +655,12 @@
                     if (dbCard) {
                         dbCard.score = savedCard.score;
                         dbCard.lastReviewed = savedCard.lastReviewed;
-                        dbCard.nextReview = new Date(savedCard.nextReview);
+                        if (savedCard.nextReview) {
+                            dbCard.nextReview = new Date(savedCard.nextReview);
+                        }
                     }
                 });
             }
-            
-            // Создаем блоки из всех карточек
-            blocks = createBlocks(allCards);
-            currentBlockIndex = 0;
             
             if (savedStats) {
                 userStats = JSON.parse(savedStats);
@@ -764,68 +772,43 @@
         // Инициализация сессии
         function initSession() {
             currentCardIndex = 0;
-            updateBlockNavigation();
+            sessionCards = createCurrentBlock();
             updatePreviewList();
-        }
-
-        // Обновление навигации по блокам
-        function updateBlockNavigation() {
-            // Обновляем информацию о блоке
-            const startQuestion = currentBlockIndex * 10 + 1;
-            const endQuestion = Math.min((currentBlockIndex + 1) * 10, allCards.length);
-            blockInfo.textContent = `Блок ${currentBlockIndex + 1} из ${blocks.length} (${startQuestion}-${endQuestion} вопросы)`;
-            
-            // Обновляем кнопки навигации
-            prevBlockBtn.disabled = currentBlockIndex === 0;
-            nextBlockBtn.disabled = currentBlockIndex === blocks.length - 1;
         }
 
         // Обновление списка предпросмотра для текущего блока
         function updatePreviewList() {
             previewList.innerHTML = '';
             
-            const currentBlock = blocks[currentBlockIndex];
-            
-            if (!currentBlock || currentBlock.length === 0) {
-                previewList.innerHTML = '<div class="empty-message">Нет карточек в этом блоке</div>';
+            if (sessionCards.length === 0) {
+                previewList.innerHTML = '<div class="empty-message">Нет карточек для изучения на сегодня</div>';
+                startTestBtn.disabled = true;
                 return;
             }
             
-            currentBlock.forEach(card => {
+            startTestBtn.disabled = false;
+            
+            // Обновляем информацию о блоке
+            const minScore = Math.min(...sessionCards.map(card => card.score));
+            const maxScore = Math.max(...sessionCards.map(card => card.score));
+            blockInfo.textContent = `Вопросы с баллами от ${minScore} до ${maxScore} (всего: ${sessionCards.length})`;
+            
+            sessionCards.forEach(card => {
                 const item = document.createElement('div');
                 item.className = 'preview-item';
                 item.innerHTML = `
                     <div class="preview-question">${card.question}</div>
-                    <div class="preview-answer">${card.answer}</div>
-                    <div style="font-size: 0.8rem; color: var(--accent-color); margin-top: 4px;">
-                        Баллы: ${card.score}/15
+                    <div class="preview-answer">
+                        ${card.answer}
+                        <span class="score-badge">${card.score}/15</span>
                     </div>
                 `;
                 previewList.appendChild(item);
             });
         }
 
-        // Переход к предыдущему блоку
-        function prevBlock() {
-            if (currentBlockIndex > 0) {
-                currentBlockIndex--;
-                updateBlockNavigation();
-                updatePreviewList();
-            }
-        }
-
-        // Переход к следующему блоку
-        function nextBlock() {
-            if (currentBlockIndex < blocks.length - 1) {
-                currentBlockIndex++;
-                updateBlockNavigation();
-                updatePreviewList();
-            }
-        }
-
         // Начать проверку текущего блока
         function startTest() {
-            sessionCards = [...blocks[currentBlockIndex]];
             currentCardIndex = 0;
             tabs[1].click();
         }
@@ -932,15 +915,13 @@
                         currentCardIndex = 0;
                         showTestCard();
                     } else if (tabName === 'preview') {
-                        updatePreviewList();
+                        initSession();
                     }
                 });
             });
 
             // Обработчики кнопок
             startTestBtn.addEventListener('click', startTest);
-            prevBlockBtn.addEventListener('click', prevBlock);
-            nextBlockBtn.addEventListener('click', nextBlock);
             checkAnswerBtn.addEventListener('click', checkAnswer);
             nextQuestionBtn.addEventListener('click', nextQuestion);
             
