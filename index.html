@@ -292,6 +292,42 @@
             font-weight: 500;
         }
         
+        .block-info {
+            text-align: center;
+            margin-bottom: 16px;
+            padding: 12px;
+            background-color: var(--accent-color);
+            color: white;
+            border-radius: var(--border-radius);
+            font-weight: 500;
+        }
+        
+        .block-navigation {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 16px;
+        }
+        
+        .block-btn {
+            padding: 12px 20px;
+            border: none;
+            border-radius: var(--border-radius);
+            background-color: var(--accent-color);
+            color: white;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .block-btn:hover {
+            background-color: var(--secondary-color);
+        }
+        
+        .block-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
         .history-table-container {
             overflow-x: auto;
             margin-top: 16px;
@@ -377,11 +413,20 @@
             </div>
             
             <div class="card">
+                <div class="block-info" id="block-info">
+                    Блок 1 из 1 (1-10 вопросы)
+                </div>
+                
+                <div class="block-navigation">
+                    <button class="block-btn" id="prev-block-btn" disabled>← Предыдущий</button>
+                    <button class="block-btn" id="next-block-btn">Следующий →</button>
+                </div>
+                
                 <h3 style="text-align: center; margin-bottom: 16px; color: var(--primary-color);">Текущие даты для повторения:</h3>
                 <div class="preview-list" id="preview-list">
                     <!-- Список вопросов-ответов будет здесь -->
                 </div>
-                <button class="btn btn-primary" id="start-test-btn">Начать проверку</button>
+                <button class="btn btn-primary" id="start-test-btn">Начать проверку этого блока</button>
             </div>
         </div>
         
@@ -456,7 +501,12 @@
             { "question": "Восстание декабристов", "answer": "14 декабря 1825 г." },
             { "question": "Первая мировая война", "answer": "28 июля 1914 г." },
             { "question": "Гражданская война в США", "answer": "12 апреля 1861 г." },
-            { "question": "Великая Отечественная война", "answer": "22 июня 1941 г." }
+            { "question": "Великая Отечественная война", "answer": "22 июня 1941 г." },
+            { "question": "Революция 1905 года", "answer": "9 января 1905 г." },
+            { "question": "Варфоломеевская ночь", "answer": "24 августа 1572 г." },
+            { "question": "Взятие Бастилии", "answer": "14 июля 1789 г." },
+            { "question": "Битва при Ватерлоо", "answer": "18 июня 1815 г." },
+            { "question": "Холодная война", "answer": "1947 г." }
         ];
 
         // Элементы DOM
@@ -472,6 +522,9 @@
         const correctAnswer = document.getElementById('correct-answer');
         const previewList = document.getElementById('preview-list');
         const historyTableBody = document.getElementById('history-table-body');
+        const blockInfo = document.getElementById('block-info');
+        const prevBlockBtn = document.getElementById('prev-block-btn');
+        const nextBlockBtn = document.getElementById('next-block-btn');
 
         // Статистические элементы
         const totalCardsEl = document.getElementById('total-cards');
@@ -486,8 +539,10 @@
 
         // Переменные состояния
         let currentCardIndex = 0;
+        let currentBlockIndex = 0;
         let sessionCards = [];
         let allCards = [];
+        let blocks = [];
         let userStats = {
             totalCards: 0,
             masteredCards: 0,
@@ -495,6 +550,15 @@
             dueToday: 0,
             studyHistory: []
         };
+
+        // Разделение карточек на блоки по 10
+        function createBlocks(cards) {
+            const blocks = [];
+            for (let i = 0; i < cards.length; i += 10) {
+                blocks.push(cards.slice(i, i + 10));
+            }
+            return blocks;
+        }
 
         // Загрузка данных
         async function loadData() {
@@ -528,27 +592,21 @@
             }));
             
             if (savedCards) {
-                sessionCards = JSON.parse(savedCards);
+                const savedCardsData = JSON.parse(savedCards);
                 // Обновляем вопросы из базы данных
-                sessionCards.forEach(card => {
-                    const dbCard = allCards.find(c => c.question === card.question);
+                savedCardsData.forEach(savedCard => {
+                    const dbCard = allCards.find(c => c.question === savedCard.question);
                     if (dbCard) {
-                        card.answer = dbCard.answer;
+                        dbCard.score = savedCard.score;
+                        dbCard.lastReviewed = savedCard.lastReviewed;
+                        dbCard.nextReview = new Date(savedCard.nextReview);
                     }
                 });
-                // Обновляем allCards с сохраненными данными
-                allCards.forEach(card => {
-                    const savedCard = sessionCards.find(c => c.question === card.question);
-                    if (savedCard) {
-                        card.score = savedCard.score;
-                        card.lastReviewed = savedCard.lastReviewed;
-                        card.nextReview = new Date(savedCard.nextReview);
-                    }
-                });
-            } else {
-                sessionCards = [...allCards];
-                saveCards();
             }
+            
+            // Создаем блоки из всех карточек
+            blocks = createBlocks(allCards);
+            currentBlockIndex = 0;
             
             if (savedStats) {
                 userStats = JSON.parse(savedStats);
@@ -659,41 +717,35 @@
 
         // Инициализация сессии
         function initSession() {
-            const now = new Date();
-            let dueCards = allCards.filter(card => 
-                !card.nextReview || new Date(card.nextReview) <= now
-            );
-            
-            // Если все карточки имеют 15 баллов, обнуляем их и берем больше карточек
-            if (dueCards.length === 0 && allCards.every(card => card.score >= 15)) {
-                allCards.forEach(card => {
-                    card.score = 0;
-                    card.nextReview = new Date();
-                });
-                dueCards = allCards.slice(0, 20);
-                saveCards();
-            }
-            
-            if (dueCards.length === 0) {
-                dueCards = allCards.filter(card => card.score === 0).slice(0, 10);
-            }
-            
-            sessionCards = dueCards;
             currentCardIndex = 0;
-            
+            updateBlockNavigation();
             updatePreviewList();
         }
 
-        // Обновление списка предпросмотра - ТЕПЕРЬ ПОКАЗЫВАЕТ ТОЛЬКО ТЕКУЩИЕ КАРТОЧКИ
+        // Обновление навигации по блокам
+        function updateBlockNavigation() {
+            // Обновляем информацию о блоке
+            const startQuestion = currentBlockIndex * 10 + 1;
+            const endQuestion = Math.min((currentBlockIndex + 1) * 10, allCards.length);
+            blockInfo.textContent = `Блок ${currentBlockIndex + 1} из ${blocks.length} (${startQuestion}-${endQuestion} вопросы)`;
+            
+            // Обновляем кнопки навигации
+            prevBlockBtn.disabled = currentBlockIndex === 0;
+            nextBlockBtn.disabled = currentBlockIndex === blocks.length - 1;
+        }
+
+        // Обновление списка предпросмотра для текущего блока
         function updatePreviewList() {
             previewList.innerHTML = '';
             
-            if (sessionCards.length === 0) {
-                previewList.innerHTML = '<div class="empty-message">Нет карточек для изучения на сегодня</div>';
+            const currentBlock = blocks[currentBlockIndex];
+            
+            if (!currentBlock || currentBlock.length === 0) {
+                previewList.innerHTML = '<div class="empty-message">Нет карточек в этом блоке</div>';
                 return;
             }
             
-            sessionCards.forEach(card => {
+            currentBlock.forEach(card => {
                 const item = document.createElement('div');
                 item.className = 'preview-item';
                 item.innerHTML = `
@@ -705,6 +757,31 @@
                 `;
                 previewList.appendChild(item);
             });
+        }
+
+        // Переход к предыдущему блоку
+        function prevBlock() {
+            if (currentBlockIndex > 0) {
+                currentBlockIndex--;
+                updateBlockNavigation();
+                updatePreviewList();
+            }
+        }
+
+        // Переход к следующему блоку
+        function nextBlock() {
+            if (currentBlockIndex < blocks.length - 1) {
+                currentBlockIndex++;
+                updateBlockNavigation();
+                updatePreviewList();
+            }
+        }
+
+        // Начать проверку текущего блока
+        function startTest() {
+            sessionCards = [...blocks[currentBlockIndex]];
+            currentCardIndex = 0;
+            tabs[1].click();
         }
 
         // Показать карточку для тестирования
@@ -823,10 +900,9 @@
             });
 
             // Обработчики кнопок
-            startTestBtn.addEventListener('click', () => {
-                tabs[1].click();
-            });
-            
+            startTestBtn.addEventListener('click', startTest);
+            prevBlockBtn.addEventListener('click', prevBlock);
+            nextBlockBtn.addEventListener('click', nextBlock);
             checkAnswerBtn.addEventListener('click', checkAnswer);
             nextQuestionBtn.addEventListener('click', nextQuestion);
             
