@@ -1,7 +1,7 @@
 {
-  "name": "Учет аренды",
-  "short_name": "Аренда",
-  "description": "Приложение для учета аренды и коммунальных платежей",
+  "name": "История",
+  "short_name": "История",
+  "description": "Исторические даты",
   "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#3498db",
