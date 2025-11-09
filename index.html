@@ -2,13 +2,12 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-<meta name="theme-color" content="#3498db">
+    <meta name="theme-color" content="#2a6d5d">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Исторические даты</title>
-	<link rel="manifest" href="./manifest.json">
+    <link rel="manifest" href="./manifest.json">
     <link rel="icon" type="image/png" href="./Zastavka.png">
     <link rel="apple-touch-icon" href="./Zastavka.png">
     <style>
@@ -271,6 +270,8 @@
             flex-direction: column;
             gap: 12px;
             margin-bottom: 20px;
+            max-height: 400px;
+            overflow-y: auto;
         }
         
         .preview-item {
@@ -291,10 +292,15 @@
             font-weight: 500;
         }
         
+        .history-table-container {
+            overflow-x: auto;
+            margin-top: 16px;
+        }
+        
         .history-table {
             width: 100%;
             border-collapse: collapse;
-            margin-top: 16px;
+            min-width: 300px;
         }
         
         .history-table th,
@@ -302,12 +308,15 @@
             padding: 12px;
             text-align: left;
             border-bottom: 1px solid var(--bg-color);
+            white-space: nowrap;
         }
         
         .history-table th {
             background-color: var(--bg-color);
             font-weight: 600;
             color: var(--primary-color);
+            position: sticky;
+            top: 0;
         }
         
         .history-table tr:last-child td {
@@ -322,6 +331,14 @@
         .incorrect-count {
             color: var(--incorrect-color);
             font-weight: 600;
+        }
+        
+        .empty-message {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--text-color);
+            opacity: 0.7;
+            font-style: italic;
         }
     </style>
 </head>
@@ -360,7 +377,7 @@
             </div>
             
             <div class="card">
-                <h3 style="text-align: center; margin-bottom: 16px; color: var(--primary-color);">Повторите даты:</h3>
+                <h3 style="text-align: center; margin-bottom: 16px; color: var(--primary-color);">Текущие даты для повторения:</h3>
                 <div class="preview-list" id="preview-list">
                     <!-- Список вопросов-ответов будет здесь -->
                 </div>
@@ -434,7 +451,12 @@
             { "question": "Открытие Америки Колумбом", "answer": "12 октября 1492 г." },
             { "question": "Бородинское сражение", "answer": "7 сентября 1812 г." },
             { "question": "Падение Берлинской стены", "answer": "9 ноября 1989 г." },
-            { "question": "Распад СССР", "answer": "26 декабря 1991 г." }
+            { "question": "Распад СССР", "answer": "26 декабря 1991 г." },
+            { "question": "Ледовое побоище", "answer": "5 апреля 1242 г." },
+            { "question": "Восстание декабристов", "answer": "14 декабря 1825 г." },
+            { "question": "Первая мировая война", "answer": "28 июля 1914 г." },
+            { "question": "Гражданская война в США", "answer": "12 апреля 1861 г." },
+            { "question": "Великая Отечественная война", "answer": "22 июня 1941 г." }
         ];
 
         // Элементы DOM
@@ -465,6 +487,7 @@
         // Переменные состояния
         let currentCardIndex = 0;
         let sessionCards = [];
+        let allCards = [];
         let userStats = {
             totalCards: 0,
             masteredCards: 0,
@@ -494,25 +517,36 @@
             const savedCards = localStorage.getItem('historyCards');
             const savedStats = localStorage.getItem('historyStats');
             
+            // Загружаем все карточки
+            allCards = cardsDatabase.map((card, index) => ({
+                id: index + 1,
+                question: card.question,
+                answer: card.answer,
+                score: 0,
+                lastReviewed: null,
+                nextReview: new Date()
+            }));
+            
             if (savedCards) {
                 sessionCards = JSON.parse(savedCards);
                 // Обновляем вопросы из базы данных
                 sessionCards.forEach(card => {
-                    const dbCard = cardsDatabase.find(c => c.question === card.question);
+                    const dbCard = allCards.find(c => c.question === card.question);
                     if (dbCard) {
                         card.answer = dbCard.answer;
                     }
                 });
+                // Обновляем allCards с сохраненными данными
+                allCards.forEach(card => {
+                    const savedCard = sessionCards.find(c => c.question === card.question);
+                    if (savedCard) {
+                        card.score = savedCard.score;
+                        card.lastReviewed = savedCard.lastReviewed;
+                        card.nextReview = new Date(savedCard.nextReview);
+                    }
+                });
             } else {
-                // Инициализация карточек
-                sessionCards = cardsDatabase.map((card, index) => ({
-                    id: index + 1,
-                    question: card.question,
-                    answer: card.answer,
-                    score: 0,
-                    lastReviewed: null,
-                    nextReview: new Date()
-                }));
+                sessionCards = [...allCards];
                 saveCards();
             }
             
@@ -527,7 +561,7 @@
 
         // Сохранение данных
         function saveCards() {
-            localStorage.setItem('historyCards', JSON.stringify(sessionCards));
+            localStorage.setItem('historyCards', JSON.stringify(allCards));
         }
 
         function saveStats() {
@@ -537,14 +571,14 @@
         // Обновление статистики
         function updateStats() {
             const now = new Date();
-            const dueCards = sessionCards.filter(card => 
+            const dueCards = allCards.filter(card => 
                 !card.nextReview || new Date(card.nextReview) <= now
             );
             
-            const masteredCards = sessionCards.filter(card => card.score >= 15).length;
-            const totalScore = sessionCards.reduce((sum, card) => sum + card.score, 0);
+            const masteredCards = allCards.filter(card => card.score >= 15).length;
+            const totalScore = allCards.reduce((sum, card) => sum + card.score, 0);
             
-            userStats.totalCards = sessionCards.length;
+            userStats.totalCards = allCards.length;
             userStats.masteredCards = masteredCards;
             userStats.currentScore = totalScore;
             userStats.dueToday = dueCards.length;
@@ -564,7 +598,7 @@
             if (userStats.studyHistory.length === 0) {
                 historyTableBody.innerHTML = `
                     <tr>
-                        <td colspan="4" style="text-align: center; padding: 20px;">
+                        <td colspan="4" class="empty-message">
                             Пока нет данных о занятиях
                         </td>
                     </tr>
@@ -626,22 +660,22 @@
         // Инициализация сессии
         function initSession() {
             const now = new Date();
-            let dueCards = sessionCards.filter(card => 
+            let dueCards = allCards.filter(card => 
                 !card.nextReview || new Date(card.nextReview) <= now
             );
             
             // Если все карточки имеют 15 баллов, обнуляем их и берем больше карточек
-            if (dueCards.length === 0 && sessionCards.every(card => card.score >= 15)) {
-                sessionCards.forEach(card => {
+            if (dueCards.length === 0 && allCards.every(card => card.score >= 15)) {
+                allCards.forEach(card => {
                     card.score = 0;
                     card.nextReview = new Date();
                 });
-                dueCards = sessionCards.slice(0, 20);
+                dueCards = allCards.slice(0, 20);
                 saveCards();
             }
             
             if (dueCards.length === 0) {
-                dueCards = sessionCards.filter(card => card.score === 0).slice(0, 10);
+                dueCards = allCards.filter(card => card.score === 0).slice(0, 10);
             }
             
             sessionCards = dueCards;
@@ -650,12 +684,12 @@
             updatePreviewList();
         }
 
-        // Обновление списка предпросмотра
+        // Обновление списка предпросмотра - ТЕПЕРЬ ПОКАЗЫВАЕТ ТОЛЬКО ТЕКУЩИЕ КАРТОЧКИ
         function updatePreviewList() {
             previewList.innerHTML = '';
             
             if (sessionCards.length === 0) {
-                previewList.innerHTML = '<div style="text-align: center; padding: 20px; color: var(--text-color); opacity: 0.7;">Нет карточек для изучения</div>';
+                previewList.innerHTML = '<div class="empty-message">Нет карточек для изучения на сегодня</div>';
                 return;
             }
             
@@ -665,6 +699,9 @@
                 item.innerHTML = `
                     <div class="preview-question">${card.question}</div>
                     <div class="preview-answer">${card.answer}</div>
+                    <div style="font-size: 0.8rem; color: var(--accent-color); margin-top: 4px;">
+                        Баллы: ${card.score}/15
+                    </div>
                 `;
                 previewList.appendChild(item);
             });
@@ -726,6 +763,14 @@
             card.nextReview = nextDate;
             card.lastReviewed = now;
             
+            // Обновляем карточку в основном массиве
+            const mainCard = allCards.find(c => c.question === card.question);
+            if (mainCard) {
+                mainCard.score = card.score;
+                mainCard.nextReview = card.nextReview;
+                mainCard.lastReviewed = card.lastReviewed;
+            }
+            
             saveCards();
             updateStats();
             
@@ -771,6 +816,8 @@
                     if (tabName === 'test') {
                         currentCardIndex = 0;
                         showTestCard();
+                    } else if (tabName === 'preview') {
+                        updatePreviewList();
                     }
                 });
             });
