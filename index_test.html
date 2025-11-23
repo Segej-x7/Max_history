@@ -1,0 +1,4922 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="theme-color" content="#2a6d5d">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Исторические даты</title>
+    <link rel="manifest" href="./manifest.json">
+    <link rel="icon" type="image/png" href="./Zastavka.png">
+    <link rel="apple-touch-icon" href="./Zastavka.png">
+    <style>
+        :root {
+            --primary-color: #2a6d5d;
+            --secondary-color: #4a8c7c;
+            --accent-color: #6baa9a;
+            --bg-color: #f0f5f3;
+            --card-color: #ffffff;
+            --text-color: #2a3a35;
+            --correct-color: #27ae60;
+            --incorrect-color: #e74c3c;
+            --border-radius: 12px;
+            --shadow: 0 4px 12px rgba(42, 109, 93, 0.2);
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+        
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            padding: 16px;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+        
+        .container {
+            background-color: var(--card-color);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 24px;
+        }
+        
+        h1 {
+            color: var(--primary-color);
+            font-size: 1.5rem;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+        
+        .subtitle {
+            color: var(--text-color);
+            opacity: 0.8;
+            font-size: 0.95rem;
+        }
+        
+        .tabs {
+            display: flex;
+            margin-bottom: 20px;
+            background-color: var(--bg-color);
+            border-radius: var(--border-radius);
+            padding: 4px;
+        }
+        
+        .tab {
+            flex: 1;
+            padding: 12px;
+            text-align: center;
+            background: none;
+            border: none;
+            border-radius: 8px;
+            font-weight: 500;
+            cursor: pointer;
+            color: var(--text-color);
+            opacity: 0.7;
+            transition: all 0.3s ease;
+        }
+        
+        .tab.active {
+            background-color: var(--primary-color);
+            color: white;
+            opacity: 1;
+        }
+        
+        .stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+        
+        .stat-item {
+            background-color: var(--bg-color);
+            padding: 12px;
+            border-radius: var(--border-radius);
+            text-align: center;
+        }
+        
+        .stat-value {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--primary-color);
+        }
+        
+        .stat-label {
+            font-size: 0.85rem;
+            opacity: 0.8;
+            margin-top: 4px;
+        }
+        
+        .progress-container {
+            margin-bottom: 20px;
+        }
+        
+        .progress-bar {
+            height: 6px;
+            background-color: var(--bg-color);
+            border-radius: 3px;
+            overflow: hidden;
+            margin-bottom: 8px;
+        }
+        
+        .progress {
+            height: 100%;
+            background-color: var(--secondary-color);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+        
+        .progress-text {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.85rem;
+            color: var(--text-color);
+            opacity: 0.8;
+        }
+        
+        .card {
+            background-color: var(--card-color);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            padding: 20px;
+            margin-bottom: 16px;
+        }
+        
+        .card-question {
+            font-size: 1.3rem;
+            margin-bottom: 20px;
+            text-align: center;
+            font-weight: 500;
+            line-height: 1.4;
+            min-height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .options-container {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .option-btn {
+            padding: 16px;
+            border: 2px solid var(--accent-color);
+            border-radius: var(--border-radius);
+            background-color: var(--card-color);
+            color: var(--text-color);
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-align: left;
+        }
+        
+        .option-btn:hover {
+            background-color: var(--bg-color);
+        }
+        
+        .option-btn.selected {
+            border-color: var(--primary-color);
+            background-color: rgba(42, 109, 93, 0.1);
+        }
+        
+        .option-btn.correct {
+            border-color: var(--correct-color);
+            background-color: rgba(39, 174, 96, 0.1);
+            color: var(--correct-color);
+        }
+        
+        .option-btn.incorrect {
+            border-color: var(--incorrect-color);
+            background-color: rgba(231, 76, 60, 0.1);
+            color: var(--incorrect-color);
+        }
+        
+        .result-message {
+            padding: 12px;
+            border-radius: var(--border-radius);
+            margin-bottom: 16px;
+            text-align: center;
+            font-weight: 500;
+            display: none;
+        }
+        
+        .result-correct {
+            background-color: rgba(39, 174, 96, 0.1);
+            color: var(--correct-color);
+            border: 1px solid var(--correct-color);
+        }
+        
+        .result-incorrect {
+            background-color: rgba(231, 76, 60, 0.1);
+            color: var(--incorrect-color);
+            border: 1px solid var(--incorrect-color);
+        }
+        
+        .correct-answer {
+            background-color: var(--bg-color);
+            padding: 16px;
+            border-radius: var(--border-radius);
+            margin-bottom: 16px;
+            font-size: 1.1rem;
+            text-align: center;
+            color: var(--primary-color);
+            font-weight: 500;
+            display: none;
+        }
+        
+        .buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+        
+        .btn {
+            padding: 16px;
+            border: none;
+            border-radius: var(--border-radius);
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background-color: var(--secondary-color);
+        }
+        
+        .btn-secondary {
+            background-color: var(--accent-color);
+            color: white;
+        }
+        
+        .btn-secondary:hover {
+            background-color: var(--secondary-color);
+        }
+        
+        .hidden {
+            display: none;
+        }
+        
+        .preview-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 20px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        
+        .preview-item {
+            background-color: var(--bg-color);
+            padding: 16px;
+            border-radius: var(--border-radius);
+            border-left: 4px solid var(--accent-color);
+        }
+        
+        .preview-question {
+            font-weight: 500;
+            margin-bottom: 8px;
+            color: var(--text-color);
+        }
+        
+        .preview-answer {
+            color: var(--primary-color);
+            font-weight: 500;
+        }
+        
+        .block-info {
+            text-align: center;
+            margin-bottom: 16px;
+            padding: 12px;
+            background-color: var(--accent-color);
+            color: white;
+            border-radius: var(--border-radius);
+            font-weight: 500;
+        }
+        
+        .history-table-container {
+            overflow-x: auto;
+            margin-top: 16px;
+        }
+        
+        .history-table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 300px;
+        }
+        
+        .history-table th,
+        .history-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid var(--bg-color);
+            white-space: nowrap;
+        }
+        
+        .history-table th {
+            background-color: var(--bg-color);
+            font-weight: 600;
+            color: var(--primary-color);
+            position: sticky;
+            top: 0;
+        }
+        
+        .history-table tr:last-child td {
+            border-bottom: none;
+        }
+        
+        .correct-count {
+            color: var(--correct-color);
+            font-weight: 600;
+        }
+        
+        .incorrect-count {
+            color: var(--incorrect-color);
+            font-weight: 600;
+        }
+        
+        .empty-message {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--text-color);
+            opacity: 0.7;
+            font-style: italic;
+        }
+        
+        .score-badge {
+            display: inline-block;
+            padding: 4px 8px;
+            background-color: var(--primary-color);
+            color: white;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            margin-left: 8px;
+        }
+        
+        .score-display {
+            text-align: center;
+            margin-bottom: 16px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--primary-color);
+        }
+        
+        .streak-counter {
+            display: inline-block;
+            padding: 4px 12px;
+            background-color: var(--correct-color);
+            color: white;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            margin-left: 8px;
+        }
+        
+        .loading-message {
+            text-align: center;
+            padding: 20px;
+            color: var(--primary-color);
+            font-style: italic;
+        }
+        
+        .success-message {
+            text-align: center;
+            padding: 12px;
+            background-color: rgba(39, 174, 96, 0.1);
+            color: var(--correct-color);
+            border: 1px solid var(--correct-color);
+            border-radius: var(--border-radius);
+            margin-bottom: 16px;
+            font-weight: 500;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Исторические даты</h1>
+            <p class="subtitle">Изучайте и повторяйте</p>
+        </header>
+        
+        <div class="tabs">
+            <button class="tab active" data-tab="preview">Просмотр дат</button>
+            <button class="tab" data-tab="test">Тестирование</button>
+            <button class="tab" data-tab="stats">Статистика</button>
+        </div>
+        
+        <!-- Вкладка предварительного просмотра -->
+        <div id="preview-tab">
+            <div class="stats">
+                <div class="stat-item">
+                    <div class="stat-value" id="total-cards">0</div>
+                    <div class="stat-label">Всего</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="mastered-cards">0</div>
+                    <div class="stat-label">Выучено</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="current-score">0</div>
+                    <div class="stat-label">Баллы</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="due-today">0</div>
+                    <div class="stat-label">На сегодня</div>
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="block-info" id="block-info">
+                    Загрузка вопросов...
+                </div>
+                
+                <h3 style="text-align: center; margin-bottom: 16px; color: var(--primary-color);">
+                    Вопросы с наименьшими баллами:
+                </h3>
+                <div class="preview-list" id="preview-list">
+                    <div class="loading-message">Загрузка данных...</div>
+                </div>
+                <button class="btn btn-primary" id="start-test-btn" disabled>Начать тестирование</button>
+            </div>
+        </div>
+        
+        <!-- Вкладка тестирования -->
+        <div id="test-tab" class="hidden">
+            <div class="progress-container">
+                <div class="progress-bar">
+                    <div class="progress" id="progress"></div>
+                </div>
+                <div class="progress-text">
+                    <span>Прогресс</span>
+                    <span id="progress-text">0/0</span>
+                </div>
+            </div>
+            
+            <div class="score-display">
+                Баллы: <span id="current-session-score">0</span>
+                <span class="streak-counter" id="streak-counter" style="display: none;">Серия: 0</span>
+            </div>
+            
+            <div class="card">
+                <div class="card-question" id="test-question">
+                    Загрузка вопросов...
+                </div>
+                
+                <div class="options-container" id="options-container">
+                    <div class="loading-message">Загрузка вариантов ответов...</div>
+                </div>
+                
+                <div class="result-message" id="result-message"></div>
+                <div class="correct-answer" id="correct-answer"></div>
+                
+                <div class="buttons">
+                    <button class="btn btn-primary" id="check-answer-btn" style="display: none;">Проверить</button>
+                    <button class="btn btn-secondary" id="next-question-btn" disabled>Следующий вопрос</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Вкладка статистики -->
+        <div id="stats-tab" class="hidden">
+            <div class="card">
+                <h3 style="text-align: center; margin-bottom: 20px; color: var(--primary-color);">Статистика по дням</h3>
+                <div class="history-table-container">
+                    <table class="history-table">
+                        <thead>
+                            <tr>
+                                <th>Дата</th>
+                                <th>Всего</th>
+                                <th>Правильно</th>
+                                <th>Неправильно</th>
+                            </tr>
+                        </thead>
+                        <tbody id="history-table-body">
+                            <tr>
+                                <td colspan="4" class="empty-message">Загрузка статистики...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Функция для перемешивания массива (алгоритм Фишера-Йетса)
+        function shuffleArray(array) {
+            const shuffled = [...array];
+            for (let i = shuffled.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+            }
+            return shuffled;
+        }
+
+        // Полная база данных вопросов (встроенная в код)
+        const fullQuestionsDatabase = {
+            "questions": [
+    {
+      "question": "«Призвание» варягов",
+      "options": ["879", "882", "945", "862"],
+      "answer": 3
+    },
+    {
+      "question": "Образование Древнерусского государства",
+      "options": ["879", "882", "945", "862"],
+      "answer": 3
+    },
+    {
+      "question": "Поход Олега на Константинополь",
+      "options": ["862", "911", "912", "907"],
+      "answer": 3
+    },
+    {
+      "question": "Первый договор Руси с Византией",
+      "options": ["907", "912", "945", "911"],
+      "answer": 3
+    },
+    {
+      "question": "Начало правления князя Игоря",
+      "options": ["911", "945", "955", "912"],
+      "answer": 3
+    },
+    {
+      "question": "Конец правления князя Игоря",
+      "options": ["912", "955", "964", "945"],
+      "answer": 3
+    },
+    {
+      "question": "Походы Игоря на Константинополь и договор с Византией",
+      "options": ["907, 911", "980-1015", "941, 944", "972-978"],
+      "answer": 2
+    },
+    {
+      "question": "Восстание древлян и гибель князя Игоря",
+      "options": ["912", "955", "964", "945"],
+      "answer": 3
+    },
+    {
+      "question": "Начало регентства княгини Ольги",
+      "options": ["912", "955", "964", "945"],
+      "answer": 3
+    },
+    {
+      "question": "Конец регентства княгини Ольги",
+      "options": ["945", "955", "972", "964"],
+      "answer": 3
+    },
+    {
+      "question": "Принятие Ольгой христианства",
+      "options": ["945", "964", "972", "955 (957)"],
+      "answer": 3
+    },
+    {
+      "question": "Начало походов Святослава",
+      "options": ["945", "955", "972", "964"],
+      "answer": 3
+    },
+    {
+      "question": "Конец походов Святослава",
+      "options": ["964", "969", "978", "972"],
+      "answer": 3
+    },
+    {
+      "question": "Покорение вятичей",
+      "options": ["945", "955", "972", "964"],
+      "answer": 3
+    },
+    {
+      "question": "Поход на Волжскую Булгарию",
+      "options": ["964-965", "966-967", "969-970", "970-971"],
+      "answer": 1
+    },
+    {
+      "question": "Разгром Хазарского каганата Святославом",
+      "options": ["966", "970", "971", "969"],
+      "answer": 3
+    },
+    {
+      "question": "Война с Византийской империей",
+      "options": ["964-966", "966-967", "969-970", "970-971"],
+      "answer": 3
+    },
+    {
+      "question": "Начало княжения Владимира Святославича в Киеве",
+      "options": ["972", "980", "1015", "978"],
+      "answer": 3
+    },
+    {
+      "question": "Конец княжения Владимира Святославича в Киеве",
+      "options": ["978", "980", "988", "1015"],
+      "answer": 3
+    },
+    {
+      "question": "Религиозная реформа Владимира",
+      "options": ["978", "988", "1015", "980"],
+      "answer": 3
+    },
+    {
+      "question": "Окончательное покорение вятичей",
+      "options": ["978", "988", "1015", "981"],
+      "answer": 3
+    },
+    {
+      "question": "Присоединение к Руси городов Перемышль, Червень",
+      "options": ["978", "988", "1015", "981"],
+      "answer": 3
+    },
+    {
+      "question": "Крещение Руси",
+      "options": ["980", "1015", "1019", "988"],
+      "answer": 3
+    },
+    {
+      "question": "Усобица между сыновьями Владимира",
+      "options": ["978-980", "1015-1019", "1068-1072", "1097-1113"],
+      "answer": 1
+    },
+    {
+      "question": "Создание Правды Ярослава",
+      "options": ["1015", "1019", "1054", "1016"],
+      "answer": 3
+    },
+    {
+      "question": "Битва на р. Альте",
+      "options": ["1015", "1016", "1054", "1019"],
+      "answer": 3
+    },
+    {
+      "question": "Начало княжения Ярослава Мудрого",
+      "options": ["1015", "1016", "1054", "1019"],
+      "answer": 3
+    },
+    {
+      "question": "Конец княжения Ярослава Мудрого",
+      "options": ["1019", "1036", "1043", "1054"],
+      "answer": 3
+    },
+    {
+      "question": "Основание г. Юрьева",
+      "options": ["1019", "1036", "1043", "1030"],
+      "answer": 3
+    },
+    {
+      "question": "Разгром печенегов под Киевом",
+      "options": ["1030", "1043", "1051", "1036"],
+      "answer": 3
+    },
+    {
+      "question": "Неудачное военное столкновение Руси с Византией",
+      "options": ["1036", "1051", "1068", "1043"],
+      "answer": 3
+    },
+    {
+      "question": "Избрание митрополита Илариона",
+      "options": ["1036", "1043", "1068", "1051"],
+      "answer": 3
+    },
+    {
+      "question": "Поражение русских войск от половцев на реке Альте",
+      "options": ["1051", "1072", "1097", "1068"],
+      "answer": 3
+    },
+    {
+      "question": "Создание Правды Ярославичей",
+      "options": ["1068", "1097", "1111", "1072"],
+      "answer": 3
+    },
+    {
+      "question": "Любечский съезд князей",
+      "options": ["1068", "1072", "1111", "1097"],
+      "answer": 3
+    },
+    {
+      "question": "Разгром половцев на реке Сальнице",
+      "options": ["1072", "1097", "1113", "1111"],
+      "answer": 3
+    },
+    {
+      "question": "Восстание в Киеве и Устав о резах и закупах",
+      "options": ["1097", "1111", "1125", "1113"],
+      "answer": 3
+    },
+    {
+      "question": "Начало княжения Владимира Мономаха",
+      "options": ["1097", "1111", "1125", "1113"],
+      "answer": 3
+    },
+    {
+      "question": "Конец княжения Владимира Мономаха",
+      "options": ["1111", "1113", "1132", "1125"],
+      "answer": 3
+    },
+    {
+      "question": "Начало княжения Мстислава Великого",
+      "options": ["1113", "1125", "1132", "1125"],
+      "answer": 3
+    },
+    {
+      "question": "Конец княжения Мстислава Великого",
+      "options": ["1125", "1132", "1157", "1132"],
+      "answer": 3
+    },
+    {
+      "question": "Смерть Мстислава Великого",
+      "options": ["1125", "1157", "1174", "1132"],
+      "answer": 3
+    },
+    {
+      "question": "Период политической раздробленности Руси",
+      "options": ["IX – XI вв", "XIV – XVI вв", "ХII – ХV вв", "XVI – XVIII вв"],
+      "answer": 2
+    },
+    {
+      "question": "Создание «Повести временных лет»",
+      "options": ["конец XI в", "начало XII в", "середина XII в", "конец XII в"],
+      "answer": 1
+    },
+    {
+      "question": "Начало княжения Юрия Долгорукого",
+      "options": ["1113", "1125", "1132", "1125"],
+      "answer": 3
+    },
+    {
+      "question": "Конец княжения Юрия Долгорукого",
+      "options": ["1125", "1132", "1136", "1157"],
+      "answer": 3
+    },
+    {
+      "question": "Установление в Новгороде республики",
+      "options": ["1132", "1147", "1157", "1136"],
+      "answer": 3
+    },
+    {
+      "question": "Первое упоминание Москвы",
+      "options": ["1132", "1136", "1157", "1147"],
+      "answer": 3
+    },
+    {
+      "question": "Начало княжения Андрея Боголюбского",
+      "options": ["1136", "1147", "1174", "1157"],
+      "answer": 3
+    },
+    {
+      "question": "Конец княжения Андрея Боголюбского",
+      "options": ["1157", "1169", "1176", "1174"],
+      "answer": 3
+    },
+    {
+      "question": "Разгром Киева войсками Андрея Боголюбского",
+      "options": ["1157", "1174", "1176", "1169"],
+      "answer": 3
+    },
+    {
+      "question": "Начало княжения Всеволода Большое Гнездо",
+      "options": ["1169", "1174", "1212", "1176"],
+      "answer": 3
+    },
+    {
+      "question": "Конец княжения Всеволода Большое Гнездо",
+      "options": ["1176", "1185", "1199", "1212"],
+      "answer": 3
+    },
+    {
+      "question": "Поход Игоря Святославича на половцев",
+      "options": ["1176", "1199", "1223", "1185"],
+      "answer": 3
+    },
+    {
+      "question": "Объединение Галицкой и Волынской Земель",
+      "options": ["1185", "1223", "1237", "1199"],
+      "answer": 3
+    },
+    {
+      "question": "Битва на р. Калке",
+      "options": ["1199", "1237", "1240", "1223"],
+      "answer": 3
+    },
+    {
+      "question": "Начало Батыева нашествия на Русь",
+      "options": ["1223", "1240", "1242", "1237"],
+      "answer": 3
+    },
+    {
+      "question": "Конец Батыева нашествия на Русь",
+      "options": ["1237", "1238", "1240", "1241"],
+      "answer": 3
+    },
+    {
+      "question": "Разорение Рязани войском Батыя",
+      "options": ["1223", "1238", "1240", "1237"],
+      "answer": 3
+    },
+    {
+      "question": "Разорение Батыем Северо-Восточной Руси",
+      "options": ["1237", "1239", "1240", "1238"],
+      "answer": 3
+    },
+    {
+      "question": "Битва на р. Сить",
+      "options": ["декабрь 1237", "сентябрь 1238", "март 1238", "июнь 1240"],
+      "answer": 2
+    },
+    {
+      "question": "Начало нашествия Батыя на Южную и Юго-Западную Русь",
+      "options": ["1237", "1238", "1240", "1239"],
+      "answer": 3
+    },
+    {
+      "question": "Конец нашествия Батыя на Южную и Юго-Западную Русь",
+      "options": ["1239", "1240", "1242", "1241"],
+      "answer": 3
+    },
+    {
+      "question": "Разорение Батыем Киева",
+      "options": ["1238", "1239", "1242", "1240"],
+      "answer": 3
+    },
+    {
+      "question": "Невская битва",
+      "options": ["1238", "1240", "1242", "1252"],
+      "answer": 2
+    },
+    {
+      "question": "Ледовое побоище",
+      "options": ["1240", "1252", "1263", "1242"],
+      "answer": 3
+    },
+    {
+      "question": "Неврюева рать",
+      "options": ["1240", "1242", "1263", "1252"],
+      "answer": 3
+    },
+    {
+      "question": "Начало владимирского княжения Александра Невского",
+      "options": ["1242", "1263", "1276", "1252"],
+      "answer": 3
+    },
+    {
+      "question": "Конец владимирского княжения Александра Невского",
+      "options": ["1252", "1276", "1303", "1263"],
+      "answer": 3
+    },
+    {
+      "question": "Образование Московского княжества",
+      "options": ["1252", "1263", "1303", "1276"],
+      "answer": 3
+    },
+    {
+      "question": "Начало правления Даниила Александровича",
+      "options": ["1263", "1303", "1325", "1276"],
+      "answer": 3
+    },
+    {
+      "question": "Конец правления Даниила Александровича",
+      "options": ["1276", "1325", "1340", "1303"],
+      "answer": 3
+    },
+    {
+      "question": "Начало правления Юрия Даниловича",
+      "options": ["1276", "1303", "1325", "1303"],
+      "answer": 3
+    },
+    {
+      "question": "Конец правления Юрия Даниловича",
+      "options": ["1303", "1325", "1340", "1325"],
+      "answer": 3
+    },
+    {
+      "question": "Начало правления Ивана Калиты",
+      "options": ["1303", "1325", "1340", "1325"],
+      "answer": 3
+    },
+    {
+      "question": "Конец правления Ивана Калиты",
+      "options": ["1325", "1327", "1328", "1340"],
+      "answer": 3
+    },
+    {
+      "question": "Антиордынское восстание в Твери",
+      "options": ["1325", "1328", "1359", "1327"],
+      "answer": 3
+    },
+    {
+      "question": "Перенос резиденции митрополита в Москву",
+      "options": ["1325", "1327", "1359", "1328"],
+      "answer": 3
+    },
+    {
+      "question": "Начало правления Дмитрия Донского",
+      "options": ["1328", "1359", "1389", "1359"],
+      "answer": 3
+    },
+    {
+      "question": "Конец правления Дмитрия Донского",
+      "options": ["1359", "1378", "1382", "1389"],
+      "answer": 3
+    },
+    {
+      "question": "Неудачные походы на Москву литовского князя Ольгерда",
+      "options": ["1359-1361", "1368, 1370, 1372", "1378-1380", "1382-1385"],
+      "answer": 1
+    },
+    {
+      "question": "Битва на реке Воже",
+      "options": ["1368", "1380", "1382", "1378"],
+      "answer": 3
+    },
+    {
+      "question": "Куликовская битва",
+      "options": ["5 апреля 1380", "8 сентября 1380", "11 августа 1378", "23 июня 1382"],
+      "answer": 1
+    },
+    {
+      "question": "Поход Тохтамыша на Москву",
+      "options": ["1378", "1380", "1389", "1382"],
+      "answer": 3
+    },
+    {
+      "question": "Начало правления Василия I",
+      "options": ["1380", "1382", "1425", "1389"],
+      "answer": 3
+    },
+    {
+      "question": "Конец правления Василия I",
+      "options": ["1389", "1408", "1425", "1425"],
+      "answer": 3
+    },
+    {
+      "question": "Набег Едигея на Русь и осада Москвы",
+      "options": ["1389", "1425", "1462", "1408"],
+      "answer": 3
+    },
+    {
+      "question": "Начало правления Василия II Тёмного",
+      "options": ["1408", "1425", "1462", "1425"],
+      "answer": 3
+    },
+    {
+      "question": "Конец правления Василия II Тёмного",
+      "options": ["1425", "1448", "1462", "1462"],
+      "answer": 3
+    },
+    {
+      "question": "Междоусобная война в Московском княжестве",
+      "options": ["1389-1408", "1425-1453", "1462-1505", "1533-1547"],
+      "answer": 1
+    },
+    {
+      "question": "Установление автокефалии Русской православной церкви",
+      "options": ["1425", "1462", "1480", "1448"],
+      "answer": 3
+    },
+    {
+      "question": "Начало правления Ивана III",
+      "options": ["1448", "1462", "1505", "1462"],
+      "answer": 3
+    },
+    {
+      "question": "Конец правления Ивана III",
+      "options": ["1462", "1471", "1478", "1505"],
+      "answer": 3
+    },
+    {
+      "question": "Сражение на реке Шелони",
+      "options": ["1462", "1478", "1480", "1471"],
+      "answer": 3
+    },
+    {
+      "question": "Присоединение Новгородской земли к Москве",
+      "options": ["1471", "1480", "1485", "1478"],
+      "answer": 3
+    },
+    {
+      "question": "Стояние на реке Угре",
+      "options": ["1471", "1478", "1485", "1480"],
+      "answer": 3
+    },
+    {
+      "question": "Присоединение Твери к Москве",
+      "options": ["1478", "1480", "1497", "1485"],
+      "answer": 3
+    },
+    {
+      "question": "Принятие общерусского Судебника",
+      "options": ["1480", "1485", "1505", "1497"],
+      "answer": 3
+    },
+    {
+      "question": "Начало княжения Василия III",
+      "options": ["1485", "1497", "1533", "1505"],
+      "answer": 3
+    },
+    {
+      "question": "Конец княжения Василия III",
+      "options": ["1497", "1505", "1547", "1533"],
+      "answer": 3
+    },
+    {
+      "question": "Присоединение Псковской земли",
+      "options": ["1505", "1514", "1521", "1510"],
+      "answer": 3
+    },
+    {
+      "question": "Включение в состав Русского государства Смоленска",
+      "options": ["1510", "1521", "1533", "1514"],
+      "answer": 3
+    },
+    {
+      "question": "Присоединение Рязанского княжества",
+      "options": ["1510", "1514", "1533", "1521"],
+      "answer": 3
+    },
+    {
+      "question": "Начало княжения Ивана IV",
+      "options": ["1514", "1521", "1584", "1533"],
+      "answer": 3
+    },
+    {
+      "question": "Конец княжения Ивана IV",
+      "options": ["1533", "1547", "1584", "1584"],
+      "answer": 3
+    },
+    {
+      "question": "Регентство Елены Глинской",
+      "options": ["1533-1538", "1538-1547", "1547-1553", "1558-1583"],
+      "answer": 0
+    },
+    {
+      "question": "Период боярского правления",
+      "options": ["1533-1538", "1538-1547", "1547-1565", "1565-1572"],
+      "answer": 1
+    },
+    {
+      "question": "Принятие Иваном IV царского титула",
+      "options": ["1533", "1549", "1550", "1547"],
+      "answer": 3
+    },
+    {
+      "question": "Первый Земский собор",
+      "options": ["1547", "1550", "1552", "1549"],
+      "answer": 3
+    },
+    {
+      "question": "Принятие Судебника Ивана IV",
+      "options": ["1547", "1549", "1552", "1550"],
+      "answer": 3
+    },
+    {
+      "question": "Запрет местнических споров во время войны",
+      "options": ["1549", "1550", "1552", "1550"],
+      "answer": 3
+    },
+    {
+      "question": "Создание первых стрелецких полков в Москве",
+      "options": ["1549", "1550", "1552", "1550"],
+      "answer": 3
+    },
+    {
+      "question": "Взятие Казани",
+      "options": ["1550", "1556", "1558", "1552"],
+      "answer": 3
+    },
+    {
+      "question": "Принятие Уложения о службе",
+      "options": ["1550-1552", "1555-1556", "1565-1572", "1581-1585"],
+      "answer": 1
+    },
+    {
+      "question": "Отмена кормлений",
+      "options": ["1552", "1555", "1558", "1556"],
+      "answer": 3
+    },
+    {
+      "question": "Присоединение Астраханского ханства",
+      "options": ["1552", "1555", "1558", "1556"],
+      "answer": 3
+    },
+    {
+      "question": "Начало Ливонской войны",
+      "options": ["1552", "1556", "1583", "1558"],
+      "answer": 3
+    },
+    {
+      "question": "Конец Ливонской войны",
+      "options": ["1558", "1564", "1572", "1583"],
+      "answer": 3
+    },
+    {
+      "question": "Начало книгопечатания на Руси",
+      "options": ["1558", "1565", "1572", "1564"],
+      "answer": 3
+    },
+    {
+      "question": "Начало опричнины",
+      "options": ["1564", "1572", "1581", "1565"],
+      "answer": 3
+    },
+    {
+      "question": "Конец опричнины",
+      "options": ["1565", "1572", "1581", "1572"],
+      "answer": 3
+    },
+    {
+      "question": "Битва при Молодях",
+      "options": ["1565", "1572", "1581", "1572"],
+      "answer": 3
+    },
+    {
+      "question": "Указ о заповедных летах",
+      "options": ["1572", "1581", "1582", "1581"],
+      "answer": 3
+    },
+    {
+      "question": "Осада Пскова Стефаном Баторием",
+      "options": ["1572-1573", "1581-1582", "1582-1583", "1584-1585"],
+      "answer": 1
+    },
+    {
+      "question": "Покорение Сибирского ханства Ермаком",
+      "options": ["1572-1573", "1581-1585", "1582-1583", "1584-1589"],
+      "answer": 1
+    },
+    {
+      "question": "Ям-Запольское перемирие с Речью Посполитой",
+      "options": ["1581", "1583", "1589", "1582"],
+      "answer": 3
+    },
+    {
+      "question": "Плюсское перемирие со Швецией",
+      "options": ["1581", "1582", "1589", "1583"],
+      "answer": 3
+    },
+    {
+      "question": "Начало правления Фёдора Иоанновича",
+      "options": ["1581", "1583", "1598", "1584"],
+      "answer": 3
+    },
+    {
+      "question": "Конец правления Фёдора Иоанновича",
+      "options": ["1584", "1589", "1597", "1598"],
+      "answer": 3
+    },
+    {
+      "question": "Учреждение в России патриаршества",
+      "options": ["1584", "1597", "1598", "1589"],
+      "answer": 3
+    },
+    {
+      "question": "Указ об урочных летах",
+      "options": ["1589", "1598", "1605", "1597"],
+      "answer": 3
+    },
+    {
+      "question": "Начало правления Бориса Годунова",
+      "options": ["1589", "1597", "1605", "1598"],
+      "answer": 3
+    },
+    {
+      "question": "Конец правления Бориса Годунова",
+      "options": ["1598", "1604", "1606", "1605"],
+      "answer": 3
+    },
+    {
+      "question": "Начало Смуты в России",
+      "options": ["1598", "1605", "1618", "1604"],
+      "answer": 3
+    },
+    {
+      "question": "Конец Смуты в России",
+      "options": ["1605", "1613", "1618", "1618"],
+      "answer": 3
+    },
+    {
+      "question": "Вторжение войска Лжедмитрия I в Россию",
+      "options": ["1598", "1605", "1606", "1604"],
+      "answer": 3
+    },
+    {
+      "question": "Смерть Бориса Годунова",
+      "options": ["март 1605", "апрель 1605", "июнь 1605", "май 1606"],
+      "answer": 1
+    },
+    {
+      "question": "Начало правления Лжедмитрия I",
+      "options": ["1604", "1606", "1610", "1605"],
+      "answer": 3
+    },
+    {
+      "question": "Конец правления Лжедмитрия I",
+      "options": ["1605", "1607", "1610", "1606"],
+      "answer": 3
+    },
+    {
+      "question": "Начало правления Василия Шуйского",
+      "options": ["1605", "1606", "1610", "1606"],
+      "answer": 3
+    },
+    {
+      "question": "Конец правления Василия Шуйского",
+      "options": ["1606", "1607", "1611", "1610"],
+      "answer": 3
+    },
+    {
+      "question": "Восстание Ивана Болотникова",
+      "options": ["1603-1605", "1606-1607", "1607-1610", "1611-1612"],
+      "answer": 1
+    },
+    {
+      "question": "Движение Лжедмитрия II",
+      "options": ["1605-1606", "1606-1607", "1607-1610", "1611-1612"],
+      "answer": 2
+    },
+    {
+      "question": "Вторжение Речи Посполитой в Россию",
+      "options": ["1606", "1607", "1611", "1609"],
+      "answer": 3
+    },
+    {
+      "question": "Свержение Василия Шуйского",
+      "options": ["1607", "1609", "1611", "1610"],
+      "answer": 3
+    },
+    {
+      "question": "Первое ополчение",
+      "options": ["1609", "1610", "1612", "1611"],
+      "answer": 3
+    },
+    {
+      "question": "Второе ополчение и освобождение Москвы",
+      "options": ["1609-1610", "1611-1612", "1613-1618", "1617-1618"],
+      "answer": 1
+    },
+    {
+      "question": "Избрание Михаила Фёдоровича Романова на царствование",
+      "options": ["1611", "1612", "1618", "1613"],
+      "answer": 3
+    },
+    {
+      "question": "Начало царствования Михаила Фёдоровича",
+      "options": ["1612", "1613", "1645", "1613"],
+      "answer": 3
+    },
+    {
+      "question": "Конец царствования Михаила Фёдоровича",
+      "options": ["1613", "1617", "1618", "1645"],
+      "answer": 3
+    },
+    {
+      "question": "Столбовский мир со Швецией",
+      "options": ["1613", "1618", "1634", "1617"],
+      "answer": 3
+    },
+    {
+      "question": "Деулинское перемирие с Речью Посполитой",
+      "options": ["1613", "1617", "1634", "1618"],
+      "answer": 3
+    },
+    {
+      "question": "Начало Смоленской войны",
+      "options": ["1617", "1618", "1634", "1632"],
+      "answer": 3
+    },
+    {
+      "question": "Конец Смоленской войны",
+      "options": ["1632", "1634", "1645", "1634"],
+      "answer": 3
+    },
+    {
+      "question": "Поляновский мир с Речью Посполитой",
+      "options": ["1632", "1634", "1645", "1634"],
+      "answer": 3
+    },
+    {
+      "question": "Азовское сидение донских казаков",
+      "options": ["1632-1634", "1637-1642", "1648-1649", "1654-1667"],
+      "answer": 1
+    },
+    {
+      "question": "Начало царствования Алексея Михайловича",
+      "options": ["1634", "1645", "1676", "1645"],
+      "answer": 3
+    },
+    {
+      "question": "Конец царствования Алексея Михайловича",
+      "options": ["1645", "1648", "1649", "1676"],
+      "answer": 3
+    },
+    {
+      "question": "Соляной бунт в Москве",
+      "options": ["1645", "1649", "1653", "1648"],
+      "answer": 3
+    },
+    {
+      "question": "Начало похода Семёна Дежнёва",
+      "options": ["1645", "1648", "1649", "1653"],
+      "answer": 2
+    },
+    {
+      "question": "Принятие Соборного уложения",
+      "options": ["1648", "1653", "1654", "1649"],
+      "answer": 3
+    },
+    {
+      "question": "Походы Ерофея Хабарова",
+      "options": ["1648-1650", "1649-1653", "1654-1655", "1656-1661"],
+      "answer": 1
+    },
+    {
+      "question": "Принятие Торгового устава",
+      "options": ["1649", "1654", "1667", "1653"],
+      "answer": 3
+    },
+    {
+      "question": "Начало реформы патриарха Никона и раскола",
+      "options": ["1649", "1653", "1654", "1653"],
+      "answer": 3
+    },
+    {
+      "question": "Переяславская рада",
+      "options": ["1653", "1656", "1667", "1654"],
+      "answer": 3
+    },
+    {
+      "question": "Начало войны России с Речью Посполитой",
+      "options": ["1653", "1654", "1667", "1654"],
+      "answer": 3
+    },
+    {
+      "question": "Конец войны России с Речью Посполитой",
+      "options": ["1654", "1656", "1661", "1667"],
+      "answer": 3
+    },
+    {
+      "question": "Начало войны со Швецией",
+      "options": ["1654", "1656", "1661", "1656"],
+      "answer": 3
+    },
+    {
+      "question": "Конец войны со Швецией (Кардисский мир)",
+      "options": ["1656", "1661", "1662", "1661"],
+      "answer": 3
+    },
+    {
+      "question": "Медный бунт",
+      "options": ["1656", "1661", "1667", "1662"],
+      "answer": 3
+    },
+    {
+      "question": "Восстание Василия Уса",
+      "options": ["1662", "1667", "1670", "1666"],
+      "answer": 3
+    },
+    {
+      "question": "Андрусовское перемирие",
+      "options": ["1661", "1662", "1667", "1667"],
+      "answer": 3
+    },
+    {
+      "question": "Первый этап восстания Степана Разина",
+      "options": ["1662-1664", "1667-1669", "1670-1671", "1668-1676"],
+      "answer": 1
+    },
+    {
+      "question": "Принятие Новоторгового устава",
+      "options": ["1662", "1667", "1670", "1667"],
+      "answer": 3
+    },
+    {
+      "question": "Осада Соловецкого монастыря",
+      "options": ["1667-1669", "1668-1676", "1670-1671", "1676-1682"],
+      "answer": 1
+    },
+    {
+      "question": "Второй этап восстания Степана Разина",
+      "options": ["1667-1669", "1668-1676", "1670-1671", "1676-1682"],
+      "answer": 2
+    },
+    {
+      "question": "Начало царствования Фёдора Алексеевича",
+      "options": ["1667", "1676", "1682", "1676"],
+      "answer": 3
+    },
+    {
+      "question": "Конец царствования Фёдора Алексеевича",
+      "options": ["1676", "1679", "1682", "1682"],
+      "answer": 3
+    },
+    {
+      "question": "Введение подворного налогообложения",
+      "options": ["1676", "1681", "1682", "1679"],
+      "answer": 3
+    },
+    {
+      "question": "Бахчисарайский мир",
+      "options": ["1676", "1679", "1682", "1681"],
+      "answer": 3
+    },
+    {
+      "question": "Отмена местничества",
+      "options": ["1679", "1681", "1686", "1682"],
+      "answer": 3
+    },
+    {
+      "question": "Стрелецкий бунт",
+      "options": ["1-3 мая 1682", "15-18 мая 1682", "25-28 июня 1682", "10-13 августа 1682"],
+      "answer": 1
+    },
+    {
+      "question": "Начало царствования Петра I при регентстве Софьи",
+      "options": ["1679", "1681", "1689", "1682"],
+      "answer": 3
+    },
+    {
+      "question": "Конец регентства Софьи",
+      "options": ["1682", "1686", "1689", "1689"],
+      "answer": 3
+    },
+    {
+      "question": "«Вечный мир» с Речью Посполитой",
+      "options": ["1682", "1687", "1689", "1686"],
+      "answer": 3
+    },
+    {
+      "question": "Основание Славяно-греко-латинской академии",
+      "options": ["1682", "1686", "1689", "1687"],
+      "answer": 3
+    },
+    {
+      "question": "Крымские походы",
+      "options": ["1682, 1689", "1687, 1689", "1695, 1696", "1697, 1698"],
+      "answer": 1
+    },
+    {
+      "question": "Нерчинский договор с Китаем",
+      "options": ["1686", "1687", "1689", "1689"],
+      "answer": 3
+    },
+    {
+      "question": "Переворот в пользу Петра I",
+      "options": ["июнь 1682", "сентябрь 1689", "август 1689", "январь 1696"],
+      "answer": 2
+    },
+    {
+      "question": "Правление Петра I совместно с Иваном V",
+      "options": ["1682-1689", "1689-1696", "1696-1725", "1700-1721"],
+      "answer": 1
+    },
+    {
+      "question": "Начало единоличного правления Петра I",
+      "options": ["1689", "1696", "1725", "1696"],
+      "answer": 3
+    },
+    {
+      "question": "Конец правления Петра I",
+      "options": ["1696", "1721", "1725", "1725"],
+      "answer": 3
+    },
+    {
+      "question": "Азовские походы",
+      "options": ["1687, 1689", "1695, 1696", "1697, 1698", "1700, 1702"],
+      "answer": 1
+    },
+    {
+      "question": "Великое посольство",
+      "options": ["1695-1696", "1697-1698", "1699-1700", "1700-1701"],
+      "answer": 1
+    },
+    {
+      "question": "Стрелецкий бунт",
+      "options": ["1682", "1698", "1705", "1707"],
+      "answer": 1
+    },
+    {
+      "question": "Заключение Северного союза",
+      "options": ["1697", "1698", "1700", "1699"],
+      "answer": 3
+    },
+    {
+      "question": "Экспедиция В. В. Атласова на Камчатку",
+      "options": ["1695-1696", "1697-1700", "1702-1704", "1707-1709"],
+      "answer": 1
+    },
+    {
+      "question": "Константинопольский договор",
+      "options": ["1699", "1700", "1703", "1709"],
+      "answer": 1
+    },
+    {
+      "question": "Поражение под Нарвой",
+      "options": ["1699", "1700", "1702", "1704"],
+      "answer": 1
+    },
+    {
+      "question": "Начало Северной войны",
+      "options": ["1699", "1700", "1721", "1700"],
+      "answer": 3
+    },
+    {
+      "question": "Конец Северной войны",
+      "options": ["1700", "1709", "1721", "1721"],
+      "answer": 3
+    },
+    {
+      "question": "Взятие Нотебурга",
+      "options": ["1700", "1702", "1703", "1704"],
+      "answer": 1
+    },
+    {
+      "question": "Основание Санкт-Петербурга",
+      "options": ["1700", "1702", "1703", "1704"],
+      "answer": 2
+    },
+    {
+      "question": "Взятие Дерпта и Нарвы",
+      "options": ["1702", "1703", "1704", "1709"],
+      "answer": 2
+    },
+    {
+      "question": "Башкирское восстание",
+      "options": ["1700-1703", "1704-1711", "1705-1706", "1707-1708"],
+      "answer": 1
+    },
+    {
+      "question": "Астраханское восстание",
+      "options": ["1700-1703", "1704-1711", "1705-1706", "1707-1708"],
+      "answer": 2
+    },
+    {
+      "question": "Восстание Кондратия Булавина",
+      "options": ["1704-1711", "1705-1706", "1707-1708", "1708-1710"],
+      "answer": 2
+    },
+    {
+      "question": "Введение гражданского шрифта",
+      "options": ["1704", "1708", "1711", "1714"],
+      "answer": 1
+    },
+    {
+      "question": "Битва при деревне Лесной",
+      "options": ["1704", "1708", "1709", "1714"],
+      "answer": 1
+    },
+    {
+      "question": "Полтавская битва",
+      "options": ["1704", "1708", "1709", "1711"],
+      "answer": 2
+    },
+    {
+      "question": "Реформы территориального деления и органов местной власти",
+      "options": ["1700-1703", "1708-1710", "1711-1714", "1717-1721"],
+      "answer": 1
+    },
+    {
+      "question": "Учреждение Сената",
+      "options": ["1708", "1711", "1714", "1718"],
+      "answer": 1
+    },
+    {
+      "question": "Прутский поход",
+      "options": ["1709", "1711", "1714", "1720"],
+      "answer": 1
+    },
+    {
+      "question": "Адрианопольский мир",
+      "options": ["1711", "1713", "1718", "1721"],
+      "answer": 1
+    },
+    {
+      "question": "Сражение у мыса Гангут",
+      "options": ["1711", "1714", "1718", "1720"],
+      "answer": 1
+    },
+    {
+      "question": "Указ о единонаследии",
+      "options": ["1711", "1714", "1718", "1722"],
+      "answer": 1
+    },
+    {
+      "question": "Учреждение цифирных школ и основание Кунсткамеры",
+      "options": ["1711", "1714", "1718", "1721"],
+      "answer": 1
+    },
+    {
+      "question": "Учреждение Тайной канцелярии",
+      "options": ["1714", "1718", "1720", "1722"],
+      "answer": 1
+    },
+    {
+      "question": "Указ об ассамблеях",
+      "options": ["1714", "1718", "1720", "1722"],
+      "answer": 1
+    },
+    {
+      "question": "Сражение у мыса Гренгам",
+      "options": ["1714", "1718", "1720", "1721"],
+      "answer": 2
+    },
+    {
+      "question": "Ништадтский мир",
+      "options": ["1718", "1720", "1721", "1722"],
+      "answer": 2
+    },
+    {
+      "question": "Учреждение коллегий",
+      "options": ["1708-1710", "1711-1714", "1717-1721", "1722-1724"],
+      "answer": 2
+    },
+    {
+      "question": "Учреждение Синода",
+      "options": ["1718", "1720", "1721", "1722"],
+      "answer": 2
+    },
+    {
+      "question": "Издание Табели о рангах",
+      "options": ["1718", "1721", "1722", "1724"],
+      "answer": 2
+    },
+    {
+      "question": "Указ о престолонаследии",
+      "options": ["1720", "1721", "1722", "1724"],
+      "answer": 2
+    },
+    {
+      "question": "Каспийский поход",
+      "options": ["1718-1720", "1720-1721", "1722-1723", "1724-1725"],
+      "answer": 2
+    },
+    {
+      "question": "Петербургский договор",
+      "options": ["1721", "1722", "1723", "1724"],
+      "answer": 2
+    },
+    {
+      "question": "Константинопольский договор",
+      "options": ["1721", "1722", "1723", "1724"],
+      "answer": 3
+    },
+    {
+      "question": "Введение подушной подати",
+      "options": ["1721", "1722", "1723", "1724"],
+      "answer": 3
+    },
+    {
+      "question": "Указ об учреждении Академии наук и художеств",
+      "options": ["1721", "1722", "1723", "1724"],
+      "answer": 3
+    },
+    {
+      "question": "Эпоха дворцовых переворотов",
+      "options": ["1682-1696", "1725-1762", "1762-1796", "1796-1801"],
+      "answer": 1
+    },
+    {
+      "question": "Начало правления Екатерины I",
+      "options": ["1722", "1725", "1727", "1730"],
+      "answer": 1
+    },
+    {
+      "question": "Конец правления Екатерины I",
+      "options": ["1725", "1727", "1730", "1740"],
+      "answer": 1
+    },
+    {
+      "question": "Деятельность Верховного тайного совета",
+      "options": ["1725-1727", "1726-1730", "1730-1740", "1741-1761"],
+      "answer": 1
+    },
+    {
+      "question": "Начало правления Петра II",
+      "options": ["1725", "1727", "1730", "1740"],
+      "answer": 1
+    },
+    {
+      "question": "Конец правления Петра II",
+      "options": ["1727", "1730", "1740", "1741"],
+      "answer": 1
+    },
+    {
+      "question": "Кяхтинский трактат",
+      "options": ["1725", "1727", "1730", "1740"],
+      "answer": 1
+    },
+    {
+      "question": "Начало царствования Анны Иоанновны",
+      "options": ["1727", "1730", "1740", "1741"],
+      "answer": 1
+    },
+    {
+      "question": "Конец царствования Анны Иоанновны",
+      "options": ["1730", "1740", "1741", "1761"],
+      "answer": 1
+    },
+    {
+      "question": "Отмена Указа о единонаследии",
+      "options": ["1727", "1730", "1740", "1762"],
+      "answer": 1
+    },
+    {
+      "question": "Учреждение Кабинета министров",
+      "options": ["1730", "1731", "1740", "1741"],
+      "answer": 1
+    },
+    {
+      "question": "Вхождение Младшего казахского жуза в состав России",
+      "options": ["1730", "1731", "1756", "1783"],
+      "answer": 1
+    },
+    {
+      "question": "Война за Польское наследство",
+      "options": ["1730-1732", "1733-1735", "1735-1739", "1741-1743"],
+      "answer": 1
+    },
+    {
+      "question": "Начало русско-турецкой войны",
+      "options": ["1733", "1735", "1739", "1741"],
+      "answer": 1
+    },
+    {
+      "question": "Конец русско-турецкой войны (Белградский мир)",
+      "options": ["1735", "1739", "1741", "1743"],
+      "answer": 1
+    },
+    {
+      "question": "Начало царствования Ивана VI Антоновича",
+      "options": ["1739", "1740", "1741", "1761"],
+      "answer": 1
+    },
+    {
+      "question": "Конец царствования Ивана VI Антоновича",
+      "options": ["1740", "1741", "1761", "1762"],
+      "answer": 1
+    },
+    {
+      "question": "Начало правления Елизаветы I Петровны",
+      "options": ["1740", "1741", "1761", "1762"],
+      "answer": 1
+    },
+    {
+      "question": "Конец правления Елизаветы I Петровны",
+      "options": ["1741", "1761", "1762", "1796"],
+      "answer": 1
+    },
+    {
+      "question": "Начало русско-шведской войны",
+      "options": ["1740", "1741", "1743", "1756"],
+      "answer": 1
+    },
+    {
+      "question": "Конец русско-шведской войны (Абоский мир)",
+      "options": ["1741", "1743", "1756", "1761"],
+      "answer": 1
+    },
+    {
+      "question": "Введение монополии дворян на винокурение",
+      "options": ["1741", "1754", "1755", "1757"],
+      "answer": 1
+    },
+    {
+      "question": "Учреждение Дворянского заёмного банка",
+      "options": ["1743", "1754", "1755", "1757"],
+      "answer": 1
+    },
+    {
+      "question": "Начало генерального межевания земель",
+      "options": ["1743", "1754", "1755", "1757"],
+      "answer": 1
+    },
+    {
+      "question": "Отмена внутренних таможен",
+      "options": ["1743", "1754", "1755", "1757"],
+      "answer": 1
+    },
+    {
+      "question": "Учреждение Императорского Московского университета",
+      "options": ["1754", "1755", "1757", "1760"],
+      "answer": 1
+    },
+    {
+      "question": "Вхождение Горного Алтая в состав России",
+      "options": ["1754", "1755", "1756", "1757"],
+      "answer": 2
+    },
+    {
+      "question": "Учреждение Академии художеств в Санкт-Петербурге",
+      "options": ["1754", "1755", "1757", "1760"],
+      "answer": 2
+    },
+    {
+      "question": "Начало участия России в Семилетней войне",
+      "options": ["1755", "1757", "1761", "1762"],
+      "answer": 1
+    },
+    {
+      "question": "Конец участия России в Семилетней войне",
+      "options": ["1757", "1759", "1761", "1762"],
+      "answer": 2
+    },
+    {
+      "question": "Сражение у деревни Гросс-Егерсдорф",
+      "options": ["1755", "1757", "1758", "1759"],
+      "answer": 1
+    },
+    {
+      "question": "Битва у селения Цорндорф",
+      "options": ["1757", "1758", "1759", "1760"],
+      "answer": 1
+    },
+    {
+      "question": "Битва при деревне Кунерсдорф",
+      "options": ["1757", "1758", "1759", "1760"],
+      "answer": 2
+    },
+    {
+      "question": "Вступление русских войск в Берлин",
+      "options": ["1758", "1759", "1760", "1761"],
+      "answer": 2
+    },
+    {
+      "question": "Право помещиков ссылать крестьян в Сибирь",
+      "options": ["1758", "1759", "1760", "1765"],
+      "answer": 2
+    },
+    {
+      "question": "Начало правления Петра III",
+      "options": ["1760", "1761", "1762", "1796"],
+      "answer": 1
+    },
+    {
+      "question": "Конец правления Петра III",
+      "options": ["1761", "1762", "1796", "1801"],
+      "answer": 1
+    },
+    {
+      "question": "Петербургский мирный договор",
+      "options": ["1761", "1762", "1764", "1774"],
+      "answer": 1
+    },
+    {
+      "question": "Начало правления Екатерины II",
+      "options": ["1761", "1762", "1796", "1801"],
+      "answer": 1
+    },
+    {
+      "question": "Конец правления Екатерины II",
+      "options": ["1762", "1796", "1801", "1825"],
+      "answer": 1
+    },
+    {
+      "question": "Манифест о секуляризации церковных земель",
+      "options": ["1762", "1764", "1765", "1767"],
+      "answer": 1
+    },
+    {
+      "question": "Открытие Смольного института благородных девиц",
+      "options": ["1762", "1764", "1765", "1767"],
+      "answer": 1
+    },
+    {
+      "question": "Учреждение Вольного экономического общества",
+      "options": ["1762", "1764", "1765", "1767"],
+      "answer": 2
+    },
+    {
+      "question": "Указ о праве помещиков ссылать крестьян в каторгу",
+      "options": ["1762", "1764", "1765", "1767"],
+      "answer": 2
+    },
+    {
+      "question": "Запрещение крепостным жаловаться на помещиков",
+      "options": ["1764", "1765", "1767", "1768"],
+      "answer": 2
+    },
+    {
+      "question": "Деятельность Уложенной комиссии",
+      "options": ["1765-1766", "1767-1768", "1768-1774", "1773-1775"],
+      "answer": 1
+    },
+    {
+      "question": "Начало русско-турецкой войны",
+      "options": ["1765", "1767", "1768", "1774"],
+      "answer": 2
+    },
+    {
+      "question": "Конец русско-турецкой войны",
+      "options": ["1768", "1770", "1773", "1774"],
+      "answer": 3
+    },
+    {
+      "question": "Чесменское морское сражение",
+      "options": ["1768", "1770", "1774", "1775"],
+      "answer": 1
+    },
+    {
+      "question": "Сражение при Кагуле и у р. Ларги",
+      "options": ["1768", "1770", "1774", "1775"],
+      "answer": 1
+    },
+    {
+      "question": "Начало восстания под предводительством Е. И. Пугачёва",
+      "options": ["1768", "1770", "1773", "1775"],
+      "answer": 2
+    },
+    {
+      "question": "Конец восстания под предводительством Е. И. Пугачёва",
+      "options": ["1770", "1773", "1774", "1775"],
+      "answer": 3
+    },
+    {
+      "question": "Манифест Пугачёва о даровании крепостным воли",
+      "options": ["январь 1773", "июль 1774", "август 1775", "сентябрь 1774"],
+      "answer": 1
+    },
+    {
+      "question": "Кючук-Кайнарджийский мирный договор",
+      "options": ["1770", "1773", "1774", "1775"],
+      "answer": 2
+    },
+    {
+      "question": "Казнь Е. И. Пугачёва",
+      "options": ["1773", "1774", "1775", "1783"],
+      "answer": 2
+    },
+    {
+      "question": "Губернская реформа",
+      "options": ["1773", "1774", "1775", "1785"],
+      "answer": 2
+    },
+    {
+      "question": "Дарование свободы предпринимательства",
+      "options": ["1773", "1774", "1775", "1785"],
+      "answer": 2
+    },
+    {
+      "question": "Разделы Речи Посполитой",
+      "options": ["1768, 1772, 1793", "1772, 1793, 1795", "1793, 1795, 1807", "1815, 1830, 1863"],
+      "answer": 1
+    },
+    {
+      "question": "Вхождение Крыма в состав России",
+      "options": ["1774", "1775", "1783", "1791"],
+      "answer": 2
+    },
+    {
+      "question": "Основание Севастополя",
+      "options": ["1774", "1775", "1783", "1791"],
+      "answer": 2
+    },
+    {
+      "question": "Георгиевский трактат",
+      "options": ["1774", "1775", "1783", "1791"],
+      "answer": 2
+    },
+    {
+      "question": "Установление крепостного права в Малороссии",
+      "options": ["1774", "1775", "1783", "1791"],
+      "answer": 2
+    },
+    {
+      "question": "Жалованные грамоты дворянству и городам",
+      "options": ["1775", "1783", "1785", "1787"],
+      "answer": 2
+    },
+    {
+      "question": "Учреждение Государственного ассигнационного банка",
+      "options": ["1783", "1785", "1786", "1787"],
+      "answer": 2
+    },
+    {
+      "question": "Учреждение Государственного заёмного банка",
+      "options": ["1783", "1785", "1786", "1787"],
+      "answer": 2
+    },
+    {
+      "question": "Начало русско-турецкой войны",
+      "options": ["1783", "1785", "1787", "1791"],
+      "answer": 2
+    },
+    {
+      "question": "Конец русско-турецкой войны",
+      "options": ["1787", "1789", "1790", "1791"],
+      "answer": 3
+    },
+    {
+      "question": "Битва при Фокшанах",
+      "options": ["1787", "1789", "1790", "1791"],
+      "answer": 1
+    },
+    {
+      "question": "Сражение на р. Рымник",
+      "options": ["1787", "1789", "1790", "1791"],
+      "answer": 1
+    },
+    {
+      "question": "Морское сражение у острова Тендра",
+      "options": ["1787", "1789", "1790", "1791"],
+      "answer": 2
+    },
+    {
+      "question": "Взятие Измаила",
+      "options": ["1789", "1790", "1791", "1792"],
+      "answer": 1
+    },
+    {
+      "question": "Морское сражение у мыса Калиакрия",
+      "options": ["1789", "1790", "1791", "1792"],
+      "answer": 2
+    },
+    {
+      "question": "Ясский мирный договор",
+      "options": ["1789", "1790", "1791", "1792"],
+      "answer": 2
+    },
+    {
+      "question": "Начало русско-шведской войны",
+      "options": ["1787", "1788", "1790", "1791"],
+      "answer": 1
+    },
+    {
+      "question": "Конец русско-шведской войны (Верельский мир)",
+      "options": ["1788", "1790", "1791", "1792"],
+      "answer": 1
+    },
+    {
+      "question": "Начало правления Павла I",
+      "options": ["1775", "1785", "1796", "1801"],
+      "answer": 2
+    },
+    {
+      "question": "Конец правления Павла I",
+      "options": ["1796", "1801", "1825", "1855"],
+      "answer": 1
+    },
+    {
+      "question": "«Учреждение об императорской фамилии»",
+      "options": ["1796", "1797", "1799", "1801"],
+      "answer": 1
+    },
+    {
+      "question": "«Манифест о трёхдневной барщине»",
+      "options": ["1796", "1797", "1799", "1801"],
+      "answer": 1
+    },
+    {
+      "question": "Средиземноморский поход Ф. Ф. Ушакова",
+      "options": ["1796-1798", "1798-1800", "1799-1801", "1800-1802"],
+      "answer": 1
+    },
+    {
+      "question": "Учреждение Российско-американской компании",
+      "options": ["1797", "1799", "1801", "1803"],
+      "answer": 1
+    },
+    {
+      "question": "Итальянский и Швейцарский походы А. В. Суворова",
+      "options": ["1796-1797", "1798-1800", "1799-1800", "1800-1801"],
+      "answer": 2
+    },
+    {
+      "question": "Присоединение к России Восточной Грузии",
+      "options": ["1799", "1801", "1804", "1813"],
+      "answer": 1
+    },
+    {
+      "question": "Начало правления Александра I",
+      "options": ["1796", "1801", "1825", "1855"],
+      "answer": 1
+    },
+    {
+      "question": "Конец правления Александра I",
+      "options": ["1801", "1812", "1825", "1855"],
+      "answer": 2
+    },
+    {
+      "question": "Образование министерств",
+      "options": ["1801", "1802", "1803", "1810"],
+      "answer": 1
+    },
+    {
+      "question": "Указ о «вольных хлебопашцах»",
+      "options": ["1801", "1802", "1803", "1804"],
+      "answer": 2
+    },
+    {
+      "question": "Университетский устав Александра I",
+      "options": ["1802", "1803", "1804", "1811"],
+      "answer": 2
+    },
+    {
+      "question": "Начало русско-иранской войны",
+      "options": ["1801", "1804", "1813", "1826"],
+      "answer": 1
+    },
+    {
+      "question": "Конец русско-иранской войны (Гюлистанский мир)",
+      "options": ["1804", "1812", "1813", "1828"],
+      "answer": 2
+    },
+    {
+      "question": "Участие России в 3-й и 4-й антифранцузских коалициях",
+      "options": ["1799-1800", "1805-1807", "1808-1809", "1812-1814"],
+      "answer": 1
+    },
+    {
+      "question": "Начало русско-турецкой войны",
+      "options": ["1804", "1806", "1812", "1828"],
+      "answer": 1
+    },
+    {
+      "question": "Конец русско-турецкой войны (Бухарестский мир)",
+      "options": ["1806", "1807", "1812", "1813"],
+      "answer": 2
+    },
+    {
+      "question": "Тильзитский мир",
+      "options": ["1805", "1807", "1809", "1812"],
+      "answer": 1
+    },
+    {
+      "question": "Начало русско-шведской войны",
+      "options": ["1805", "1807", "1808", "1809"],
+      "answer": 2
+    },
+    {
+      "question": "Конец русско-шведской войны (Фридрихсгамский мир)",
+      "options": ["1807", "1808", "1809", "1812"],
+      "answer": 2
+    },
+    {
+      "question": "Учреждение Государственного совета",
+      "options": ["1801", "1802", "1810", "1811"],
+      "answer": 2
+    },
+    {
+      "question": "Учреждение Царскосельского лицея",
+      "options": ["1804", "1810", "1811", "1812"],
+      "answer": 2
+    },
+    {
+      "question": "Отечественная война",
+      "options": ["1805", "1807", "1812", "1813"],
+      "answer": 2
+    },
+    {
+      "question": "Бородинское сражение",
+      "options": ["июнь 1812", "август 1812", "октябрь 1812", "декабрь 1812"],
+      "answer": 1
+    },
+    {
+      "question": "Заграничные походы русской армии",
+      "options": ["1805-1807", "1812-1814", "1813-1814", "1814-1815"],
+      "answer": 2
+    },
+    {
+      "question": "Битва народов под Лейпцигом",
+      "options": ["1812", "1813", "1814", "1815"],
+      "answer": 1
+    },
+    {
+      "question": "Парижский мирный договор",
+      "options": ["1812", "1813", "1814", "1815"],
+      "answer": 2
+    },
+    {
+      "question": "Венский конгресс",
+      "options": ["1812-1813", "1813-1814", "1814-1815", "1815-1816"],
+      "answer": 2
+    },
+    {
+      "question": "Создание Священного союза",
+      "options": ["1813", "1814", "1815", "1816"],
+      "answer": 2
+    },
+    {
+      "question": "Дарование Конституции Царству Польскому",
+      "options": ["1813", "1814", "1815", "1830"],
+      "answer": 2
+    },
+    {
+      "question": "Отмена крепостного права в Эстляндии, Курляндии, Лифляндии",
+      "options": ["1803-1805", "1816-1819", "1825-1830", "1842-1845"],
+      "answer": 1
+    },
+    {
+      "question": "Начало создания военных поселений",
+      "options": ["1812", "1815", "1816", "1825"],
+      "answer": 2
+    },
+    {
+      "question": "Начало Кавказской войны",
+      "options": ["1812", "1815", "1817", "1825"],
+      "answer": 2
+    },
+    {
+      "question": "Конец Кавказской войны",
+      "options": ["1825", "1853", "1856", "1864"],
+      "answer": 3
+    },
+    {
+      "question": "Создание Северного и Южного тайных обществ",
+      "options": ["1816", "1821", "1825", "1826"],
+      "answer": 1
+    },
+    {
+      "question": "Восстание декабристов",
+      "options": ["1 декабря 1825", "14 декабря 1825", "26 декабря 1825", "3 января 1826"],
+      "answer": 1
+    },
+    {
+      "question": "Восстание Черниговского полка",
+      "options": ["ноябрь 1825", "декабрь 1825 – январь 1826", "январь-февраль 1826", "июль 1826"],
+      "answer": 1
+    },
+    {
+      "question": "Начало правления Николая I",
+      "options": ["1815", "1825", "1855", "1881"],
+      "answer": 1
+    },
+    {
+      "question": "Конец правления Николая I",
+      "options": ["1825", "1855", "1881", "1894"],
+      "answer": 1
+    },
+    {
+      "question": "Начало русско-иранской войны",
+      "options": ["1813", "1826", "1828", "1829"],
+      "answer": 1
+    },
+    {
+      "question": "Конец русско-иранской войны (Туркманчайский мир)",
+      "options": ["1826", "1828", "1829", "1833"],
+      "answer": 1
+    },
+    {
+      "question": "Создание III отделения СЕИВК и корпуса жандармов",
+      "options": ["1825", "1826", "1828", "1830"],
+      "answer": 1
+    },
+    {
+      "question": "Наваринское сражение",
+      "options": ["1826", "1827", "1828", "1829"],
+      "answer": 1
+    },
+    {
+      "question": "Начало русско-турецкой войны",
+      "options": ["1826", "1827", "1828", "1829"],
+      "answer": 2
+    },
+    {
+      "question": "Конец русско-турецкой войны (Адрианопольский мир)",
+      "options": ["1827", "1828", "1829", "1830"],
+      "answer": 2
+    },
+    {
+      "question": "Польское восстание",
+      "options": ["1815-1816", "1825-1826", "1830-1831", "1863-1864"],
+      "answer": 2
+    },
+    {
+      "question": "Отмена конституции Царства Польского",
+      "options": ["1825", "1830", "1832", "1863"],
+      "answer": 2
+    },
+    {
+      "question": "Завершение кодификации законов Российской империи",
+      "options": ["1825", "1830", "1832", "1833"],
+      "answer": 2
+    },
+    {
+      "question": "Теория «официальной народности»",
+      "options": ["1825", "1830", "1833", "1836"],
+      "answer": 2
+    },
+    {
+      "question": "Ункяр-Искелесийский русско-турецкий договор",
+      "options": ["1829", "1832", "1833", "1836"],
+      "answer": 2
+    },
+    {
+      "question": "Университетский устав Николая I",
+      "options": ["1825", "1830", "1835", "1848"],
+      "answer": 2
+    },
+    {
+      "question": "«Философическое письмо» П. Я. Чаадаева",
+      "options": ["1833", "1835", "1836", "1839"],
+      "answer": 2
+    },
+    {
+      "question": "Появление славянофилов и западников",
+      "options": ["начало 1820-х", "рубеж 1830-1840-х", "конец 1840-х", "начало 1860-х"],
+      "answer": 1
+    },
+    {
+      "question": "Реформа управления государственными крестьянами",
+      "options": ["1825-1830", "1837-1841", "1842-1847", "1850-1855"],
+      "answer": 1
+    },
+    {
+      "question": "Денежная реформа и введение серебряного рубля",
+      "options": ["1825-1829", "1830-1834", "1839-1843", "1845-1849"],
+      "answer": 2
+    },
+    {
+      "question": "Указ об обязанных крестьянах",
+      "options": ["1837", "1842", "1847", "1855"],
+      "answer": 1
+    },
+    {
+      "question": "Деятельность кружка петрашевцев",
+      "options": ["1825-1829", "1830-1834", "1845-1849", "1850-1854"],
+      "answer": 2
+    },
+    {
+      "question": "Инвентарная реформа",
+      "options": ["1839", "1842", "1847", "1855"],
+      "answer": 2
+    },
+    {
+      "question": "Венгерский поход",
+      "options": ["1830", "1833", "1848", "1849"],
+      "answer": 3
+    },
+    {
+      "question": "Теория «крестьянского социализма» А. И. Герцена",
+      "options": ["начало 1830-х", "конец 1840-х", "начало 1860-х", "конец 1870-х"],
+      "answer": 1
+    },
+    {
+      "question": "Завершение процесса присоединения Казахстана к России",
+      "options": ["1820-е", "1830-е", "1840-е", "1850-е"],
+      "answer": 3
+    },
+    {
+      "question": "Начало Крымской войны",
+      "options": ["1853", "1854", "1855", "1856"],
+      "answer": 0
+    },
+    {
+      "question": "Конец Крымской войны",
+      "options": ["1853", "1854", "1855", "1856"],
+      "answer": 3
+    },
+    {
+      "question": "Сражение при Синопе",
+      "options": ["1853", "1854", "1855", "1856"],
+      "answer": 0
+    },
+    {
+      "question": "Высадка англо-франко-турецких войск около Евпатории",
+      "options": ["1853", "1854", "1855", "1856"],
+      "answer": 1
+    },
+    {
+      "question": "Севастопольская оборона",
+      "options": ["1853-1854", "1854-1855", "1855-1856", "1856-1857"],
+      "answer": 1
+    },
+    {
+      "question": "Симодский договор с Японией",
+      "options": ["1853", "1854", "1855", "1856"],
+      "answer": 2
+    },
+    {
+      "question": "Парижский трактат",
+      "options": ["январь 1855", "март 1856", "август 1856", "февраль 1857"],
+      "answer": 1
+    },
+    {
+      "question": "Начало правления Александра II",
+      "options": ["1853", "1855", "1881", "1894"],
+      "answer": 1
+    },
+    {
+      "question": "Конец правления Александра II",
+      "options": ["1855", "1881", "1894", "1917"],
+      "answer": 1
+    },
+    {
+      "question": "Айгунский и Тяньцзиньский договора с Китаем",
+      "options": ["1855", "1858", "1860", "1864"],
+      "answer": 1
+    },
+    {
+      "question": "Подготовка реформы по отмене крепостного права",
+      "options": ["1853-1855", "1857-1861", "1861-1864", "1864-1874"],
+      "answer": 1
+    },
+    {
+      "question": "Пекинский договор с Китаем",
+      "options": ["1858", "1860", "1864", "1875"],
+      "answer": 1
+    },
+    {
+      "question": "Создание Государственного банка",
+      "options": ["1858", "1860", "1864", "1870"],
+      "answer": 1
+    },
+    {
+      "question": "Отмена крепостного права",
+      "options": ["3 марта 1855", "19 февраля 1861", "1 января 1864", "26 августа 1856"],
+      "answer": 1
+    },
+    {
+      "question": "Земская реформа",
+      "options": ["1861", "1864", "1870", "1874"],
+      "answer": 1
+    },
+    {
+      "question": "Судебная реформа",
+      "options": ["1861", "1864", "1870", "1874"],
+      "answer": 1
+    },
+    {
+      "question": "Цензурная реформа",
+      "options": ["1861", "1864", "1865", "1870"],
+      "answer": 2
+    },
+    {
+      "question": "Военные реформы",
+      "options": ["1857-1861", "1861-1864", "1864-1874", "1870-1877"],
+      "answer": 2
+    },
+    {
+      "question": "Деятельность первой «Земли и воли»",
+      "options": ["1857-1861", "1861-1864", "1876-1879", "1879-1881"],
+      "answer": 1
+    },
+    {
+      "question": "Присоединение Средней Азии",
+      "options": ["1857-1861", "1864-1881", "1877-1878", "1885-1895"],
+      "answer": 1
+    },
+    {
+      "question": "Продажа Аляски",
+      "options": ["1861", "1864", "1867", "1875"],
+      "answer": 2
+    },
+    {
+      "question": "Образование организации «Народная расправа»",
+      "options": ["1861", "1864", "1867", "1869"],
+      "answer": 3
+    },
+    {
+      "question": "Циркуляр Горчакова об отмене статей Парижского мира",
+      "options": ["1867", "1870", "1873", "1878"],
+      "answer": 1
+    },
+    {
+      "question": "Городская реформа",
+      "options": ["1864", "1870", "1874", "1881"],
+      "answer": 1
+    },
+    {
+      "question": "Образование Союза трёх императоров",
+      "options": ["1867", "1870", "1873", "1878"],
+      "answer": 2
+    },
+    {
+      "question": "«Хождение в народ»",
+      "options": ["1861-1864", "1873-1874, 1876", "1876-1879", "1879-1881"],
+      "answer": 1
+    },
+    {
+      "question": "Договор с Японией о присоединении Сахалина",
+      "options": ["1867", "1873", "1875", "1878"],
+      "answer": 2
+    },
+    {
+      "question": "Деятельность второй «Земли и воли»",
+      "options": ["1861-1864", "1873-1876", "1876-1879", "1879-1881"],
+      "answer": 2
+    },
+    {
+      "question": "Начало русско-турецкой войны",
+      "options": ["1873", "1875", "1877", "1878"],
+      "answer": 2
+    },
+    {
+      "question": "Конец русско-турецкой войны",
+      "options": ["1875", "1877", "1878", "1881"],
+      "answer": 2
+    },
+    {
+      "question": "Сан-Стефанский мир",
+      "options": ["1 января 1877", "19 февраля 1878", "1 июля 1878", "1 марта 1881"],
+      "answer": 1
+    },
+    {
+      "question": "Берлинский трактат",
+      "options": ["19 февраля 1878", "1 июля 1878", "1 марта 1881", "13 марта 1881"],
+      "answer": 1
+    },
+    {
+      "question": "Открытие высших женских Бестужевских курсов",
+      "options": ["1870", "1875", "1878", "1881"],
+      "answer": 2
+    },
+    {
+      "question": "Раскол «Земли и воли» на «Народную волю» и «Чёрный передел»",
+      "options": ["1876", "1878", "1879", "1881"],
+      "answer": 2
+    },
+    {
+      "question": "Деятельность Верховной распорядительной комиссии",
+      "options": ["1877-1878", "1880-1881", "1881-1882", "1882-1886"],
+      "answer": 1
+    },
+    {
+      "question": "«Конституция» Лорис-Меликова",
+      "options": ["январь 1880", "январь 1881", "март 1881", "август 1881"],
+      "answer": 1
+    },
+    {
+      "question": "Убийство Александра II",
+      "options": ["1 января 1881", "1 марта 1881", "13 марта 1881", "1 апреля 1881"],
+      "answer": 1
+    },
+    {
+      "question": "Начало правления Александра III",
+      "options": ["1878", "1881", "1894", "1905"],
+      "answer": 1
+    },
+    {
+      "question": "Конец правления Александра III",
+      "options": ["1881", "1894", "1905", "1917"],
+      "answer": 1
+    },
+    {
+      "question": "Манифест «О незыблемости самодержавия»",
+      "options": ["1881", "1882", "1885", "1889"],
+      "answer": 0
+    },
+    {
+      "question": "«Положение о мерах по охранению государственного порядка»",
+      "options": ["1881", "1882", "1885", "1889"],
+      "answer": 0
+    },
+    {
+      "question": "Учреждение Крестьянского банка",
+      "options": ["1881", "1882", "1885", "1889"],
+      "answer": 1
+    },
+    {
+      "question": "Начало формирования рабочего законодательства в России",
+      "options": ["1881 – 1883", "1882 – 1886", "1885 – 1889", "1890 – 1894"],
+      "answer": 1
+    },
+    {
+      "question": "Прекращение временнообязанного состояния",
+      "options": ["1881", "1882", "1883", "1885"],
+      "answer": 2
+    },
+    {
+      "question": "Основание группы «Освобождение труда»",
+      "options": ["1881", "1882", "1883", "1885"],
+      "answer": 2
+    },
+    {
+      "question": "Российско-британский конфликт в Средней Азии",
+      "options": ["1881", "1883", "1885", "1887"],
+      "answer": 2
+    },
+    {
+      "question": "Морозовская стачка",
+      "options": ["январь 1882", "январь 1885", "май 1886", "март 1887"],
+      "answer": 1
+    },
+    {
+      "question": "Учреждение Дворянского банка",
+      "options": ["1882", "1885", "1887", "1889"],
+      "answer": 1
+    },
+    {
+      "question": "Болгарский кризис",
+      "options": ["1881-1883", "1885-1887", "1887-1889", "1890-1892"],
+      "answer": 1
+    },
+    {
+      "question": "Расторжение Союза трёх императоров",
+      "options": ["1885", "1887", "1889", "1891"],
+      "answer": 1
+    },
+    {
+      "question": "Циркуляр о «кухаркиных детях»",
+      "options": ["1885", "1887", "1889", "1891"],
+      "answer": 1
+    },
+    {
+      "question": "Прекращение взимания подушной подати",
+      "options": ["1885", "1887", "1889", "1891"],
+      "answer": 1
+    },
+    {
+      "question": "Российско-германский «договор о перестраховке»",
+      "options": ["1885-1886", "1887-1888", "1889-1890", "1891-1892"],
+      "answer": 1
+    },
+    {
+      "question": "«Положение о земских участковых начальниках»",
+      "options": ["1885", "1887", "1889", "1891"],
+      "answer": 2
+    },
+    {
+      "question": "Завершение промышленного переворота в России",
+      "options": ["1850-е", "1870-е", "1880-е", "1890-е"],
+      "answer": 2
+    },
+    {
+      "question": "Формирование русско-французского союза",
+      "options": ["1881-1883", "1885-1887", "1891-1893", "1895-1897"],
+      "answer": 2
+    },
+    {
+      "question": "Присоединение к России Памира",
+      "options": ["1885-1889", "1887-1891", "1891-1895", "1895-1899"],
+      "answer": 2
+    },
+    {
+      "question": "Начало правления Николая II",
+      "options": ["1881", "1894", "1905", "1917"],
+      "answer": 1
+    },
+    {
+      "question": "Конец правления Николая II",
+      "options": ["1894", "1905", "1917", "1918"],
+      "answer": 2
+    },
+    {
+      "question": "Денежная реформа С. Ю. Витте",
+      "options": ["1887-1889", "1891-1893", "1895-1897", "1899-1901"],
+      "answer": 2
+    },
+    {
+      "question": "Основание «Союза борьбы за освобождение рабочего класса»",
+      "options": ["1894", "1895", "1898", "1902"],
+      "answer": 1
+    },
+    {
+      "question": "I съезд РСДРП",
+      "options": ["1895", "1898", "1902", "1903"],
+      "answer": 1
+    },
+    {
+      "question": "Основание партии эсеров",
+      "options": ["1898", "1902", "1903", "1905"],
+      "answer": 1
+    },
+    {
+      "question": "II съезд РСДРП",
+      "options": ["1898", "1902", "1903", "1905"],
+      "answer": 2
+    },
+    {
+      "question": "Начало русско-японской войны",
+      "options": ["1902", "1904", "1905", "1907"],
+      "answer": 1
+    },
+    {
+      "question": "Конец русско-японской войны",
+      "options": ["1904", "1905", "1907", "1914"],
+      "answer": 1
+    },
+    {
+      "question": "Подвиг крейсера «Варяг»",
+      "options": ["январь 1904", "февраль 1904", "июль 1904", "май 1905"],
+      "answer": 0
+    },
+    {
+      "question": "Оборона Порт-Артура",
+      "options": ["январь-май 1904", "июль-декабрь 1904", "январь-август 1905", "сентябрь-ноябрь 1905"],
+      "answer": 1
+    },
+    {
+      "question": "Цусимское сражение",
+      "options": ["июль 1904", "декабрь 1904", "май 1905", "август 1905"],
+      "answer": 2
+    },
+    {
+      "question": "Портсмутский мирный договор",
+      "options": ["май 1905", "август 1905", "октябрь 1905", "январь 1906"],
+      "answer": 1
+    },
+    {
+      "question": "Начало Первой российской революции",
+      "options": ["1904", "1905", "1907", "1914"],
+      "answer": 1
+    },
+    {
+      "question": "Конец Первой российской революции",
+      "options": ["1905", "1906", "1907", "1908"],
+      "answer": 2
+    },
+    {
+      "question": "Кровавое воскресенье",
+      "options": ["1 января 1905", "9 января 1905", "17 октября 1905", "3 июня 1907"],
+      "answer": 1
+    },
+    {
+      "question": "Манифест 17 октября",
+      "options": ["9 января 1905", "17 октября 1905", "3 июня 1907", "1 августа 1914"],
+      "answer": 1
+    },
+    {
+      "question": "Московское вооружённое восстание",
+      "options": ["январь 1905", "октябрь 1905", "декабрь 1905", "июль 1906"],
+      "answer": 2
+    },
+    {
+      "question": "Новая редакция «Основных государственных законов»",
+      "options": ["октябрь 1905", "апрель 1906", "июнь 1907", "август 1914"],
+      "answer": 1
+    },
+    {
+      "question": "I Государственная дума",
+      "options": ["январь-март 1906", "апреля-июль 1906", "февраль-июнь 1907", "ноябрь 1912-1917"],
+      "answer": 1
+    },
+    {
+      "question": "Начало аграрных реформ П. А. Столыпина",
+      "options": ["апрель 1906", "ноябрь 1906", "июнь 1907", "сентябрь 1911"],
+      "answer": 1
+    },
+    {
+      "question": "II Государственная дума",
+      "options": ["апреля-июль 1906", "февраль-3 июня 1907", "ноябрь 1907-1912", "ноябрь 1912-1917"],
+      "answer": 1
+    },
+    {
+      "question": "III Государственная дума",
+      "options": ["1905-1906", "1906-1907", "1907-1912", "1912-1917"],
+      "answer": 2
+    },
+    {
+      "question": "Образование Антанты",
+      "options": ["1904", "1907", "1914", "1917"],
+      "answer": 1
+    },
+    {
+      "question": "Ленский расстрел",
+      "options": ["1905", "1907", "1912", "1914"],
+      "answer": 2
+    },
+    {
+      "question": "Начало работы IV Государственной думы",
+      "options": ["июнь 1907", "ноябрь 1912", "август 1914", "февраль 1917"],
+      "answer": 1
+    },
+    {
+      "question": "Объявление Германией войны России",
+      "options": ["28 июня 1914", "1 августа 1914", "3 сентября 1914", "11 ноября 1918"],
+      "answer": 1
+    },
+    {
+      "question": "Восточно-Прусская операция",
+      "options": ["июль 1914", "август-сентябрь 1914", "май 1915", "июнь 1916"],
+      "answer": 1
+    },
+    {
+      "question": "«Великое отступление»",
+      "options": ["1914", "1915", "1916", "1917"],
+      "answer": 1
+    },
+    {
+      "question": "Образование Прогрессивного блока",
+      "options": ["1914", "1915", "1916", "1917"],
+      "answer": 1
+    },
+    {
+      "question": "«Министерская чехарда»",
+      "options": ["1914-1915", "сентябрь 1915-февраль 1917", "1916-1917", "февраль-октябрь 1917"],
+      "answer": 1
+    },
+    {
+      "question": "Убийство Г. Распутина",
+      "options": ["январь 1916", "декабрь 1916", "февраль 1917", "июль 1918"],
+      "answer": 1
+    },
+    {
+      "question": "Брусиловский прорыв",
+      "options": ["1914", "1915", "1916", "1917"],
+      "answer": 2
+    },
+    {
+      "question": "Начало Февральской революции",
+      "options": ["январь 1917", "февраль 1917", "октябрь 1917", "ноябрь 1917"],
+      "answer": 1
+    },
+    {
+      "question": "Конец Февральской революции",
+      "options": ["февраль 1917", "октябрь 1917", "ноябрь 1917", "март 1918"],
+      "answer": 2
+    },
+    {
+      "question": "Отречение Николая II",
+      "options": ["27 февраля 1917", "2 марта 1917", "3 марта 1917", "25 октября 1917"],
+      "answer": 1
+    },
+    {
+      "question": "Отказ от престола Михаила Александровича",
+      "options": ["2 марта 1917", "3 марта 1917", "25 октября 1917", "5 января 1918"],
+      "answer": 1
+    },
+    {
+      "question": "Апрельский политический кризис",
+      "options": ["февраль-март 1917", "апрель-май 1917", "июнь-июль 1917", "август-сентябрь 1917"],
+      "answer": 1
+    },
+    {
+      "question": "Июльский политический кризис",
+      "options": ["18-20 апреля 1917", "3-5 июля 1917", "25-26 августа 1917", "24-25 октября 1917"],
+      "answer": 1
+    },
+    {
+      "question": "Выступление генерала Л. Корнилова",
+      "options": ["апрель 1917", "июль 1917", "конец августа 1917", "октябрь 1917"],
+      "answer": 2
+    },
+    {
+      "question": "Провозглашение России республикой",
+      "options": ["2 марта 1917", "1 сентября 1917", "25 октября 1917", "5 января 1918"],
+      "answer": 1
+    },
+    {
+      "question": "Октябрьское вооружённое восстание в Петрограде",
+      "options": ["3-5 июля 1917", "24-25 октября 1917", "25-26 октября 1917", "5-6 января 1918"],
+      "answer": 1
+    },
+    {
+      "question": "II Всероссийский съезд Советов",
+      "options": ["24-25 октября 1917", "25-26 октября 1917", "26-27 октября 1917", "5-6 января 1918"],
+      "answer": 1
+    },
+    {
+      "question": "Декларация прав народов России",
+      "options": ["25 октября 1917", "2 ноября 1917", "5 января 1918", "3 марта 1918"],
+      "answer": 1
+    },
+    {
+      "question": "Выборы в Учредительное собрание",
+      "options": ["октябрь 1917", "ноябрь 1917", "декабрь 1917", "январь 1918"],
+      "answer": 1
+    },
+    {
+      "question": "Создание ВСНХ",
+      "options": ["октябрь 1917", "ноябрь 1917", "декабрь 1917", "январь 1918"],
+      "answer": 2
+    },
+    {
+      "question": "Создание ВЧК",
+      "options": ["октябрь 1917", "ноябрь 1917", "декабрь 1917", "январь 1918"],
+      "answer": 2
+    },
+    {
+      "question": "Учредительное собрание",
+      "options": ["ноябрь 1917", "декабрь 1917", "январь 1918", "март 1918"],
+      "answer": 2
+    },
+    {
+      "question": "Принятие закона о социализации земли",
+      "options": ["октябрь 1917", "ноябрь 1917", "январь 1918", "февраль 1918"],
+      "answer": 3
+    },
+    {
+      "question": "Брестский мир",
+      "options": ["январь 1918", "февраль 1918", "3 марта 1918", "март 1918"],
+      "answer": 2
+    },
+    {
+      "question": "Начало Гражданской войны",
+      "options": ["1917", "1918", "1920", "1922"],
+      "answer": 1
+    },
+    {
+      "question": "Конец Гражданской войны",
+      "options": ["1918", "1920", "1922", "1924"],
+      "answer": 2
+    },
+    {
+      "question": "Восстание Чехословацкого корпуса",
+      "options": ["январь 1918", "май 1918", "июль 1918", "ноябрь 1918"],
+      "answer": 1
+    },
+    {
+      "question": "Мятеж левых эсеров",
+      "options": ["5-6 января 1918", "6-7 июля 1918", "25-26 октября 1918", "18-19 ноября 1918"],
+      "answer": 1
+    },
+    {
+      "question": "Принятие Конституции РСФСР",
+      "options": ["октябрь 1917", "январь 1918", "июль 1918", "март 1921"],
+      "answer": 2
+    },
+    {
+      "question": "Установление диктатуры Колчака",
+      "options": ["июль 1918", "ноябрь 1918", "март 1919", "ноябрь 1919"],
+      "answer": 1
+    },
+    {
+      "question": "Интервенция английских войск на Русском Севере",
+      "options": ["1917 – 1918", "1918 – 1919", "1919 – 1920", "1920 – 1921"],
+      "answer": 1
+    },
+    {
+      "question": "Введение продовольственной развёрстки",
+      "options": ["октябрь 1917", "январь 1919", "март 1921", "январь 1924"],
+      "answer": 1
+    },
+    {
+      "question": "Создание Коминтерна",
+      "options": ["1917", "1919", "1921", "1922"],
+      "answer": 1
+    },
+    {
+      "question": "Отражение наступления войск Деникина на Москву",
+      "options": ["осень 1918", "май -ноябрь 1919", "весна 1920", "осень 1920"],
+      "answer": 1
+    },
+    {
+      "question": "Разгром армии Колчака на Урале",
+      "options": ["осень 1918", "июнь-август 1919", "весна 1920", "осень 1920"],
+      "answer": 1
+    },
+    {
+      "question": "Отражение наступления армии Юденича на Петроград",
+      "options": ["осень 1918", "май 1919", "сентябрь-октябрь 1919", "осень 1920"],
+      "answer": 2
+    },
+    {
+      "question": "Разгром армии Врангеля в Крыму",
+      "options": ["осень 1919", "весна 1920", "ноябрь 1920", "1921"],
+      "answer": 2
+    },
+    {
+      "question": "Принятие плана ГОЭЛРО",
+      "options": ["1918", "1920", "1921", "1922"],
+      "answer": 1
+    },
+    {
+      "question": "Провозглашение советских республик в Средней Азии",
+      "options": ["1918", "1920", "1922", "1924"],
+      "answer": 1
+    },
+    {
+      "question": "Провозглашение советских республик в Закавказье",
+      "options": ["1918-1919", "1920-1921", "1922-1923", "1924-1925"],
+      "answer": 1
+    },
+    {
+      "question": "Рижский мир с Польшей",
+      "options": ["1919", "1920", "1921", "1922"],
+      "answer": 2
+    },
+    {
+      "question": "Советско-турецкий договор о дружбе",
+      "options": ["1920", "1921", "1922", "1924"],
+      "answer": 1
+    },
+    {
+      "question": "Кронштадтское восстание",
+      "options": ["январь 1921", "март 1921", "август 1921", "октябрь 1922"],
+      "answer": 1
+    },
+    {
+      "question": "X съезд РКП(б)",
+      "options": ["январь 1921", "март 1921", "август 1921", "декабрь 1922"],
+      "answer": 1
+    },
+    {
+      "question": "Переход к НЭПу",
+      "options": ["январь 1921", "март 1921", "август 1921", "декабрь 1922"],
+      "answer": 1
+    },
+    {
+      "question": "Рапалльский договор с Германией",
+      "options": ["март 1921", "апрель 1922", "декабрь 1922", "январь 1924"],
+      "answer": 1
+    },
+    {
+      "question": "Изгнание белых и интервентов с Дальнего Востока",
+      "options": ["1920", "1921", "октябрь 1922", "1923"],
+      "answer": 2
+    },
+    {
+      "question": "Образование СССР",
+      "options": ["1921", "1922", "1924", "1925"],
+      "answer": 1
+    },
+    {
+      "question": "Финансовая реформа",
+      "options": ["1918-1920", "1922-1924", "1925-1927", "1928-1929"],
+      "answer": 1
+    },
+    {
+      "question": "Смерть В. Ленина",
+      "options": ["21 января 1924", "21 января 1925", "21 января 1926", "21 января 1927"],
+      "answer": 0
+    },
+    {
+      "question": "Принятие Конституции СССР",
+      "options": ["декабрь 1922", "январь 1924", "декабрь 1936", "октябрь 1977"],
+      "answer": 1
+    },
+    {
+      "question": "Борьба с «правым уклоном»",
+      "options": ["1924-1925", "1928-1929", "1932-1933", "1936-1937"],
+      "answer": 1
+    },
+    {
+      "question": "Ликвидация безработицы",
+      "options": ["1925", "1928", "1930", "1932"],
+      "answer": 2
+    },
+    {
+      "question": "Начало сплошной коллективизации",
+      "options": ["1925", "1928", "1930", "1932"],
+      "answer": 2
+    },
+    {
+      "question": "Статья И. Сталина «Головокружение от успехов»",
+      "options": ["январь 1928", "март 1930", "ноябрь 1932", "декабрь 1936"],
+      "answer": 1
+    },
+    {
+      "question": "Первая пятилетка",
+      "options": ["1925-1929", "1928-1932", "1933-1937", "1938-1942"],
+      "answer": 1
+    },
+    {
+      "question": "Начало индустриализации",
+      "options": ["1925-1929", "1928-1932", "1933-1937", "1938-1942"],
+      "answer": 1
+    },
+    {
+      "question": "Введение паспортной системы",
+      "options": ["1928", "1930", "1932", "1936"],
+      "answer": 2
+    },
+    {
+      "question": "Массовый голод в СССР",
+      "options": ["1928-1929", "1930-1931", "1932-1933", "1936-1937"],
+      "answer": 2
+    },
+    {
+      "question": "Признание СССР со стороны США",
+      "options": ["1924", "1930", "1933", "1934"],
+      "answer": 2
+    },
+    {
+      "question": "Вступление СССР в Лигу Наций",
+      "options": ["1924", "1930", "1933", "1934"],
+      "answer": 3
+    },
+    {
+      "question": "Договоры СССР с Францией и Чехословакией о взаимопомощи",
+      "options": ["1933", "1934", "1935", "1936"],
+      "answer": 2
+    },
+    {
+      "question": "Принятие второй Конституции СССР",
+      "options": ["1924", "1930", "1936", "1977"],
+      "answer": 2
+    },
+    {
+      "question": "Массовые политические репрессии",
+      "options": ["1928-1929", "1930-1931", "1934-1935", "1937-1938"],
+      "answer": 3
+    },
+    {
+      "question": "Военные конфликты у оз. Хасан и р. Халхин-Гол",
+      "options": ["1931-1932", "1935-1936", "1938-1939", "1940-1941"],
+      "answer": 2
+    },
+    {
+      "question": "Советско-германский договор о ненападении",
+      "options": ["1 сентября 1939", "23 августа 1939", "22 июня 1941", "28 ноября 1943"],
+      "answer": 1
+    },
+    {
+      "question": "Принятие в состав СССР Западной Украины и Западной Белоруссии",
+      "options": ["август 1939", "сентябрь 1939", "ноябрь 1939", "июнь 1940"],
+      "answer": 2
+    },
+    {
+      "question": "Начало советско-финляндской войны",
+      "options": ["август 1939", "ноябрь 1939", "март 1940", "июнь 1941"],
+      "answer": 1
+    },
+    {
+      "question": "Конец советско-финляндской войны",
+      "options": ["ноябрь 1939", "март 1940", "июнь 1941", "сентябрь 1944"],
+      "answer": 1
+    },
+    {
+      "question": "Вхождение Прибалтики в состав СССР",
+      "options": ["1938", "1939", "1940", "1941"],
+      "answer": 2
+    },
+    {
+      "question": "Начало Великой Отечественной войны",
+      "options": ["1 сентября 1939", "22 июня 1941", "5 декабря 1941", "9 мая 1945"],
+      "answer": 1
+    },
+    {
+      "question": "Создание Ставки Главного командования",
+      "options": ["22 июня 1941", "23 июня 1941", "30 июня 1941", "10 июля 1941"],
+      "answer": 1
+    },
+    {
+      "question": "Создание Совета по эвакуации",
+      "options": ["22 июня 1941", "24 июня 1941", "30 июня 1941", "10 июля 1941"],
+      "answer": 1
+    },
+    {
+      "question": "Создание Государственного Комитета Обороны",
+      "options": ["22 июня 1941", "24 июня 1941", "30 июня 1941", "10 июля 1941"],
+      "answer": 2
+    },
+    {
+      "question": "Смоленское сражение",
+      "options": ["22 июня-20 июля 1941", "10 июля-10 сентября 1941", "30 сентября-5 декабря 1941", "17 июля-18 ноября 1942"],
+      "answer": 1
+    },
+    {
+      "question": "Начало блокады Ленинграда",
+      "options": ["10 июля 1941", "8 сентября 1941", "30 сентября 1941", "5 декабря 1941"],
+      "answer": 1
+    },
+    {
+      "question": "Оборонительный этап Московской битвы",
+      "options": ["10 июля-10 сентября 1941", "30 сентября-5 декабря 1941", "5-6 декабря 1941", "8 сентября 1941-27 января 1944"],
+      "answer": 1
+    },
+    {
+      "question": "Контрнаступление Красной Армии под Москвой",
+      "options": ["30 сентября 1941", "5-6 декабря 1941", "19 ноября 1942", "5 июля 1943"],
+      "answer": 1
+    },
+    {
+      "question": "Начало Сталинградской битвы",
+      "options": ["30 сентября 1941", "17 июля 1942", "25 июля 1942", "19 ноября 1942"],
+      "answer": 1
+    },
+    {
+      "question": "Начало битвы за Кавказ",
+      "options": ["17 июля 1942", "25 июля 1942", "19 ноября 1942", "5 июля 1943"],
+      "answer": 1
+    },
+    {
+      "question": "Разгром немецких войск под Сталинградом",
+      "options": ["17 июля-18 ноября 1942", "19 ноября 1942-2 февраля 1943", "5 июля-23 августа 1943", "23 июня-29 августа 1944"],
+      "answer": 1
+    },
+    {
+      "question": "Прорыв блокады Ленинграда",
+      "options": ["5-6 декабря 1941", "12-18 января 1943", "5 июля 1943", "27 января 1944"],
+      "answer": 1
+    },
+    {
+      "question": "Курская битва",
+      "options": ["19 ноября 1942-2 февраля 1943", "5 июля-23 августа 1943", "23 июня-29 августа 1944", "16 апреля-2 мая 1945"],
+      "answer": 1
+    },
+    {
+      "question": "Партизанская операция «Рельсовая война»",
+      "options": ["5 июля-23 августа 1943", "3 августа-15 сентября 1943", "23 июня-29 августа 1944", "12 января-3 февраля 1945"],
+      "answer": 1
+    },
+    {
+      "question": "Освобождение Орла и Белгорода",
+      "options": ["5 июля 1943", "5 августа 1943", "23 августа 1943", "6 ноября 1943"],
+      "answer": 1
+    },
+    {
+      "question": "Избрание патриарха Сергия",
+      "options": ["5 августа 1943", "8 сентября 1943", "6 ноября 1943", "27 января 1944"],
+      "answer": 1
+    },
+    {
+      "question": "Битва за Днепр",
+      "options": ["июль-август 1943", "сентябрь-ноябрь 1943", "декабрь 1943-апрель 1944", "июнь-август 1944"],
+      "answer": 1
+    },
+    {
+      "question": "Тегеранская конференция",
+      "options": ["август 1942", "ноябрь-декабрь 1943", "февраль 1945", "июль-август 1945"],
+      "answer": 1
+    },
+    {
+      "question": "Освобождение Киева",
+      "options": ["5 августа 1943", "6 ноября 1943", "27 января 1944", "23 июня 1944"],
+      "answer": 1
+    },
+    {
+      "question": "Полное снятие блокады Ленинграда",
+      "options": ["12-18 января 1943", "27 января 1944", "23 июня 1944", "9 мая 1945"],
+      "answer": 1
+    },
+    {
+      "question": "Белорусская наступательная операция",
+      "options": ["январь-февраль 1944", "23 июня-29 августа 1944", "январь-февраль 1945", "апрель-май 1945"],
+      "answer": 1
+    },
+    {
+      "question": "Освобождение Освенцима",
+      "options": ["27 января 1944", "27 января 1945", "9 мая 1945", "2 сентября 1945"],
+      "answer": 1
+    },
+    {
+      "question": "Битва за Берлин",
+      "options": ["январь-февраль 1945", "апрель-май 1945", "9 мая 1945", "август 1945"],
+      "answer": 1
+    },
+    {
+      "question": "День Победы в Великой Отечественной войне",
+      "options": ["2 февраля 1943", "9 мая 1945", "2 сентября 1945", "24 июня 1945"],
+      "answer": 1
+    },
+    {
+      "question": "Парад Победы на Красной площади",
+      "options": ["9 мая 1945", "24 июня 1945", "2 сентября 1945", "7 ноября 1945"],
+      "answer": 1
+    },
+    {
+      "question": "Советско-японская война",
+      "options": ["9 мая-2 сентября 1945", "9 августа-2 сентября 1945", "6-9 августа 1945", "2-3 сентября 1945"],
+      "answer": 1
+    },
+    {
+      "question": "Капитуляция Японии",
+      "options": ["6 августа 1945", "9 августа 1945", "2 сентября 1945", "3 сентября 1945"],
+      "answer": 2
+    },
+    {
+      "question": "День Победы над Японией",
+      "options": ["6 августа 1945", "9 августа 1945", "2 сентября 1945", "3 сентября 1945"],
+      "answer": 3
+    },
+    {
+      "question": "Нюрнбергский процесс",
+      "options": ["1944-1945", "1945-1946", "1946-1947", "1947-1948"],
+      "answer": 1
+    },
+    {
+      "question": "Четвёртая пятилетка",
+      "options": ["1941-1945", "1946-1950", "1951-1955", "1956-1960"],
+      "answer": 1
+    },
+    {
+      "question": "Постановление «О журналах “Звезда” и “Ленинград”»",
+      "options": ["1945", "1946", "1947", "1948"],
+      "answer": 1
+    },
+    {
+      "question": "Денежная реформа и отмена карточек",
+      "options": ["1945", "1946", "1947", "1948"],
+      "answer": 2
+    },
+    {
+      "question": "Образование Коминформбюро",
+      "options": ["1945", "1946", "1947", "1949"],
+      "answer": 2
+    },
+    {
+      "question": "Советско-югославский конфликт",
+      "options": ["1945-1947", "1948-1955", "1956-1960", "1961-1964"],
+      "answer": 1
+    },
+    {
+      "question": "«Ленинградское дело»",
+      "options": ["1945-1946", "1949-1950", "1952-1953", "1956-1957"],
+      "answer": 1
+    },
+    {
+      "question": "Испытание советской атомной бомбы",
+      "options": ["1945", "1947", "1949", "1953"],
+      "answer": 2
+    },
+    {
+      "question": "Образование СЭВ",
+      "options": ["1945", "1947", "1949", "1955"],
+      "answer": 2
+    },
+    {
+      "question": "XIX съезд ВКП(б)",
+      "options": ["1945", "1949", "1952", "1956"],
+      "answer": 2
+    },
+    {
+      "question": "Переименование ВКП(б) в КПСС",
+      "options": ["1945", "1949", "1952", "1956"],
+      "answer": 2
+    },
+    {
+      "question": "«Дело врачей»",
+      "options": ["1949", "1951", "1953", "1956"],
+      "answer": 2
+    },
+    {
+      "question": "Смерть И. В. Сталина",
+      "options": ["21 января 1924", "5 марта 1953", "14 октября 1964", "10 ноября 1982"],
+      "answer": 1
+    },
+    {
+      "question": "Избрание Н. Хрущёва Первым секретарем ЦК КПСС",
+      "options": ["март 1953", "сентябрь 1953", "февраль 1956", "октябрь 1964"],
+      "answer": 1
+    },
+    {
+      "question": "Начало освоения целины",
+      "options": ["1953", "1954", "1956", "1961"],
+      "answer": 1
+    },
+    {
+      "question": "Передача Крыма Украине",
+      "options": ["1945", "1954", "1977", "2014"],
+      "answer": 1
+    },
+    {
+      "question": "Начало работы первой атомной электростанции в Обнинске",
+      "options": ["1949", "1954", "1957", "1961"],
+      "answer": 1
+    },
+    {
+      "question": "ХХ съезд КПСС",
+      "options": ["1953", "1956", "1961", "1964"],
+      "answer": 1
+    },
+    {
+      "question": "Политические кризисы в Польше и Венгрии",
+      "options": ["1953", "1956", "1961", "1968"],
+      "answer": 1
+    },
+    {
+      "question": "Создание совнархозов",
+      "options": ["1953", "1956", "1957", "1961"],
+      "answer": 2
+    },
+    {
+      "question": "Осуждение «антипартийной группы»",
+      "options": ["1953", "1956", "1957", "1961"],
+      "answer": 2
+    },
+    {
+      "question": "Всемирный фестиваль молодёжи и студентов в Москве",
+      "options": ["1953", "1956", "1957", "1961"],
+      "answer": 2
+    },
+    {
+      "question": "Запуск первого искусственного спутника Земли",
+      "options": ["12 апреля 1961", "4 октября 1957", "14 октября 1957", "3 ноября 1957"],
+      "answer": 1
+    },
+    {
+      "question": "ХХII съезд КПСС",
+      "options": ["1956", "1959", "1961", "1964"],
+      "answer": 2
+    },
+    {
+      "question": "Принятие Программы построения коммунизма",
+      "options": ["1956", "1959", "1961", "1964"],
+      "answer": 2
+    },
+    {
+      "question": "Берлинский кризис",
+      "options": ["1953", "1956", "1961", "1968"],
+      "answer": 2
+    },
+    {
+      "question": "Сооружение Берлинской стены",
+      "options": ["1953", "1956", "1961", "1968"],
+      "answer": 2
+    },
+    {
+      "question": "Полёт Ю. А. Гагарина в космос",
+      "options": ["4 октября 1957", "14 октября 1957", "12 апреля 1961", "16 июня 1963"],
+      "answer": 2
+    },
+    {
+      "question": "Волнения в Новочеркасске",
+      "options": ["1956", "1961", "1962", "1968"],
+      "answer": 2
+    },
+    {
+      "question": "Карибский кризис",
+      "options": ["1956", "1961", "1962", "1968"],
+      "answer": 2
+    },
+    {
+      "question": "Договор о запрете испытаний ядерного оружия в трёх средах",
+      "options": ["1959", "1961", "1962", "1963"],
+      "answer": 3
+    },
+    {
+      "question": "Начало конфликта между СССР и Китаем",
+      "options": ["1956", "1961", "1963", "1969"],
+      "answer": 2
+    },
+    {
+      "question": "Космический полёт В. В. Терешковой",
+      "options": ["1957", "1961", "1963", "1965"],
+      "answer": 2
+    },
+    {
+      "question": "Отстранение Н. С. Хрущёва от власти",
+      "options": ["март 1953", "октябрь 1964", "апрель 1985", "август 1991"],
+      "answer": 1
+    },
+    {
+      "question": "Начало экономической реформы А. Н. Косыгина",
+      "options": ["1956", "1961", "1965", "1968"],
+      "answer": 2
+    },
+    {
+      "question": "Демонстрация в поддержку писателей А. Д. Синявского и Ю. М. Даниэля",
+      "options": ["1961", "1965", "1968", "1974"],
+      "answer": 1
+    },
+    {
+      "question": "Договор о нераспространении ядерного оружия",
+      "options": ["1962", "1965", "1968", "1972"],
+      "answer": 2
+    },
+    {
+      "question": "Ввод войск Варшавского договора в Чехословакию",
+      "options": ["1956", "1961", "1968", "1979"],
+      "answer": 2
+    },
+    {
+      "question": "Советско-китайский вооружённый конфликт",
+      "options": ["1956", "1961", "1968", "1969"],
+      "answer": 3
+    },
+    {
+      "question": "Договор о Западном Берлине",
+      "options": ["1961", "1968", "1971", "1975"],
+      "answer": 2
+    },
+    {
+      "question": "Договоры ОСВ-I и ПРО",
+      "options": ["1968", "1971", "1972", "1975"],
+      "answer": 2
+    },
+    {
+      "question": "Высылка А. И. Солженицына из СССР",
+      "options": ["1968", "1971", "1974", "1980"],
+      "answer": 2
+    },
+    {
+      "question": "Заключительный акт Совещания по безопасности в Европе",
+      "options": ["1971", "1972", "1975", "1979"],
+      "answer": 2
+    },
+    {
+      "question": "Принятие новой Конституции СССР",
+      "options": ["1936", "1956", "1977", "1993"],
+      "answer": 2
+    },
+    {
+      "question": "Ввод советских войск в Афганистан",
+      "options": ["1968", "1975", "1979", "1989"],
+      "answer": 2
+    },
+    {
+      "question": "Летние Олимпийские игры в Москве",
+      "options": ["1972", "1976", "1980", "1984"],
+      "answer": 2
+    },
+    {
+      "question": "Ссылка А.Д.Сахарова в г. Горький",
+      "options": ["1975-1979", "1980-1986", "1982-1987", "1985-1990"],
+      "answer": 1
+    },
+    {
+      "question": "Начало правления Ю. В. Андропова",
+      "options": ["1979", "1982", "1984", "1985"],
+      "answer": 1
+    },
+    {
+      "question": "Конец правления Ю. В. Андропова",
+      "options": ["1982", "1984", "1985", "1991"],
+      "answer": 1
+    },
+    {
+      "question": "Начало правления К.У.Черненко",
+      "options": ["1982", "1984", "1985", "1991"],
+      "answer": 1
+    },
+    {
+      "question": "Конец правления К.У.Черненко",
+      "options": ["1982", "1984", "1985", "1991"],
+      "answer": 2
+    },
+    {
+      "question": "Избрание М. С. Горбачёва Генеральным секретарем",
+      "options": ["октябрь 1964", "март 1985", "август 1991", "декабрь 1991"],
+      "answer": 1
+    },
+    {
+      "question": "Провозглашение курса на ускорение",
+      "options": ["март 1985", "апрель 1985", "февраль 1986", "июнь 1987"],
+      "answer": 1
+    },
+    {
+      "question": "XXVII съезд КПСС",
+      "options": ["март 1985", "февраль 1986", "июнь 1987", "июль 1988"],
+      "answer": 1
+    },
+    {
+      "question": "Авария на Чернобыльской АЭС",
+      "options": ["март 1985", "апрель 1986", "июнь 1987", "декабрь 1988"],
+      "answer": 1
+    },
+    {
+      "question": "Закон о государственном предприятии",
+      "options": ["1985", "1986", "1987", "1988"],
+      "answer": 2
+    },
+    {
+      "question": "ХIХ партконференция КПСС",
+      "options": ["1986", "1987", "июнь-июль 1988", "1989"],
+      "answer": 2
+    },
+    {
+      "question": "I Съезд народных депутатов СССР",
+      "options": ["1987", "1988", "май -июнь 1989", "1990"],
+      "answer": 2
+    },
+    {
+      "question": "Избрание М. С. Горбачёва Президентом СССР",
+      "options": ["1988", "1989", "март 1990", "1991"],
+      "answer": 2
+    },
+    {
+      "question": "Провозглашение суверенитета РСФСР",
+      "options": ["март 1990", "12 июня 1990", "август 1991", "декабрь 1991"],
+      "answer": 1
+    },
+    {
+      "question": "Референдум о сохранении СССР",
+      "options": ["декабрь 1990", "март 1991", "август 1991", "декабрь 1991"],
+      "answer": 1
+    },
+    {
+      "question": "Избрание Б. Н. Ельцина Президентом РСФСР",
+      "options": ["март 1990", "июнь 1991", "август 1991", "декабрь 1991"],
+      "answer": 1
+    },
+    {
+      "question": "Создание Конституционного суда РСФСР",
+      "options": ["март 1990", "июнь 1991", "июль 1991", "декабрь 1991"],
+      "answer": 2
+    },
+    {
+      "question": "Августовский путч",
+      "options": ["12 июня 1990", "19-21 августа 1991", "декабрь 1991", "октябрь 1993"],
+      "answer": 1
+    },
+    {
+      "question": "Беловежское соглашение о роспуске СССР",
+      "options": ["август 1991", "декабрь 1991", "январь 1992", "март 1993"],
+      "answer": 1
+    },
+    {
+      "question": "Либерализация цен",
+      "options": ["декабрь 1991", "январь 1992", "август 1992", "октябрь 1993"],
+      "answer": 1
+    },
+    {
+      "question": "Подписание Федеративного договора",
+      "options": ["январь 1992", "март 1992", "август 1992", "декабрь 1992"],
+      "answer": 1
+    },
+    {
+      "question": "Начало приватизации",
+      "options": ["январь 1992", "август 1992", "декабрь 1992", "октябрь 1993"],
+      "answer": 1
+    },
+    {
+      "question": "Назначение В. С. Черномырдина председателем Правительства",
+      "options": ["август 1992", "декабрь 1992", "октябрь 1993", "декабрь 1993"],
+      "answer": 1
+    },
+    {
+      "question": "Начало работы Конституционного совещания",
+      "options": ["декабрь 1992", "июнь 1993", "сентябрь 1993", "декабрь 1993"],
+      "answer": 1
+    },
+    {
+      "question": "Указ «О поэтапной конституционной реформе»",
+      "options": ["июнь 1993", "сентябрь 1993", "октябрь 1993", "декабрь 1993"],
+      "answer": 1
+    },
+    {
+      "question": "Вооружённые столкновения в Москве",
+      "options": ["19-21 августа 1991", "3-4 октября 1993", "12 декабря 1993", "11 декабря 1994"],
+      "answer": 1
+    },
+    {
+      "question": "Принятие Конституции России",
+      "options": ["12 июня 1990", "3-4 октября 1993", "12 декабря 1993", "31 декабря 1999"],
+      "answer": 2
+    },
+    {
+      "question": "Выборы в Государственную думу",
+      "options": ["12 июня 1990", "3-4 октября 1993", "12 декабря 1993", "31 декабря 1999"],
+      "answer": 2
+    },
+    {
+      "question": "Первая Чеченская кампания",
+      "options": ["1991-1992", "1994-1996", "1999-2000", "2000-2002"],
+      "answer": 1
+    },
+    {
+      "question": "Выборы Государственной Думы РФ",
+      "options": ["1993, 1995", "1995, 1999", "1999, 2003", "2003, 2007"],
+      "answer": 1
+    },
+    {
+      "question": "Президентские выборы в России, победа Б. Н. Ельцина",
+      "options": ["1991", "1996", "2000", "2004"],
+      "answer": 1
+    },
+    {
+      "question": "Дефолт и девальвация рубля",
+      "options": ["1995", "1996", "1998", "1999"],
+      "answer": 2
+    },
+    {
+      "question": "Правительство С. В. Кириенко",
+      "options": ["1996", "1998", "1999", "2000"],
+      "answer": 1
+    },
+    {
+      "question": "Правительство E. М. Примакова",
+      "options": ["1997-1998", "1998-1999", "1999-2000", "2000-2004"],
+      "answer": 1
+    },
+    {
+      "question": "Правительство С. В. Степашина",
+      "options": ["1998", "1999", "2000", "2004"],
+      "answer": 1
+    },
+    {
+      "question": "Создание Союзного государства Белоруссии и России",
+      "options": ["1996", "1999", "2000", "2003"],
+      "answer": 1
+    },
+    {
+      "question": "Правительство B. В. Путина",
+      "options": ["1998-1999", "1999-2000", "2000-2004", "2004-2008"],
+      "answer": 1
+    },
+    {
+      "question": "Нападение экстремистов на Дагестан",
+      "options": ["1996", "1998", "1999", "2000"],
+      "answer": 2
+    },
+    {
+      "question": "Вторая Чеченская кампания",
+      "options": ["1994-1996", "1999-2000", "2000-2002", "2002-2004"],
+      "answer": 1
+    },
+    {
+      "question": "Досрочная отставка Б. Н. Ельцина",
+      "options": ["12 декабря 1993", "31 декабря 1999", "26 марта 2000", "7 мая 2000"],
+      "answer": 1
+    },
+    {
+      "question": "Избрание В. В. Путина на пост Президента России",
+      "options": ["1996", "2000", "2004", "2008"],
+      "answer": 1
+    },
+    {
+      "question": "Создание института полномочных представителей Президента",
+      "options": ["1999", "2000", "2004", "2008"],
+      "answer": 1
+    },
+    {
+      "question": "Учреждение Государственного совета РФ",
+      "options": ["1999", "2000", "2004", "2008"],
+      "answer": 1
+    },
+    {
+      "question": "Утверждение новой Концепции внешней политики РФ",
+      "options": ["1999", "2000", "2004", "2008"],
+      "answer": 1
+    },
+    {
+      "question": "Выборы в Государственную Думу",
+      "options": ["1999", "2003", "2007", "2011"],
+      "answer": 1
+    },
+    {
+      "question": "Избрание В. В. Путина на второй срок",
+      "options": ["2000", "2004", "2008", "2012"],
+      "answer": 1
+    },
+    {
+      "question": "Речь В. В. Путина на Мюнхенской конференции",
+      "options": ["2004", "2006", "февраль 2007", "2008"],
+      "answer": 2
+    },
+    {
+      "question": "Избрание Д. А. Медведева Президентом РФ",
+      "options": ["2004", "2008", "2012", "2018"],
+      "answer": 1
+    },
+    {
+      "question": "Операция по принуждению Грузии к миру",
+      "options": ["2004", "2006", "август 2008", "2014"],
+      "answer": 2
+    },
+    {
+      "question": "Вступление России в мировой финансовый кризис",
+      "options": ["2004", "2008", "2012", "2014"],
+      "answer": 1
+    },
+    {
+      "question": "Увеличение срока полномочий Государственной Думы до 5 лет и Президента РФ до 6 лет",
+      "options": ["2004", "2008", "2012", "2018"],
+      "answer": 1
+    },
+    {
+      "question": "ФЗ «О внесении изменений в Закон РФ ,,О занятости населения в Российской Федерации\"»",
+      "options": ["2007", "2008", "2009", "2010"],
+      "answer": 2
+    },
+    {
+      "question": "ФЗ «Об обязательном медицинском страховании в Российской Федерации»",
+      "options": ["2008", "2009", "2010", "2011"],
+      "answer": 2
+    },
+    {
+      "question": "ФЗ «Об основах охраны здоровья граждан в Российской Федерации»",
+      "options": ["2009", "2010", "2011", "2012"],
+      "answer": 2
+    },
+    {
+      "question": "Избрание В. В. Путина Президентом РФ в третий раз",
+      "options": ["2004", "2008", "2012", "2018"],
+      "answer": 2
+    },
+    {
+      "question": "Новый закон «Об образовании в Российской Федерации»",
+      "options": ["2010", "2011", "2012", "2013"],
+      "answer": 2
+    },
+    {
+      "question": "Принятие в Российскую Федерацию Республики Крым",
+      "options": ["2008", "2012", "2014", "2016"],
+      "answer": 2
+    },
+    {
+      "question": "Начало военной операции России в Сирии",
+      "options": ["2012", "2014", "2015", "2016"],
+      "answer": 2
+    },
+    {
+      "question": "Избрание В. В. Путина Президентом РФ в четвертый раз",
+      "options": ["2008", "2012", "2018", "2024"],
+      "answer": 2
+    },
+    {
+      "question": "ФЗ «О внесении изменений в отдельные законодательные акты Российской Федерации по вопросам назначения и выплаты пенсий »",
+      "options": ["2016", "2017", "2018", "2019"],
+      "answer": 2
+    },
+    {
+      "question": "Чемпионат мира по футболу в России",
+      "options": ["2014", "2016", "2018", "2020"],
+      "answer": 2
+    },
+    {
+      "question": "Пуск в эксплуатацию Крымского моста",
+      "options": ["18 марта 2014", "23 декабря 2019", "30 сентября 2022", "1 января 2023"],
+      "answer": 1
+    },
+    {
+      "question": "Сдача в эксплуатацию трубопровода «Турецкий поток»",
+      "options": ["2018", "2019", "2020", "2021"],
+      "answer": 2
+    },
+    {
+      "question": "Голосование по принятию поправок к Конституции РФ",
+      "options": ["2018", "2019", "2020", "2021"],
+      "answer": 2
+    },
+    {
+      "question": "Выборы в Государственную думу восьмого созыва",
+      "options": ["2018", "2019", "2020", "2021"],
+      "answer": 3
+    },
+    {
+      "question": "Признание Российской Федерацией независимости ДНР и ЛНР",
+      "options": ["18 марта 2014", "21 февраля 2022", "24 февраля 2022", "30 сентября 2022"],
+      "answer": 1
+    },
+    {
+      "question": "Начало Специальной военной операции",
+      "options": ["18 марта 2014", "21 февраля 2022", "24 февраля 2022", "30 сентября 2022"],
+      "answer": 2
+    },
+    {
+      "question": "Подписание договоров о принятии ДНР, ЛНР, Запорожской и Херсонской областей в состав России",
+      "options": ["18 марта 2014", "21 февраля 2022", "24 февраля 2022", "30 сентября 2022"],
+      "answer": 3
+    },
+    {
+      "question": "Падение Западной Римской империи",
+      "options": ["410", "455", "476", "493"],
+      "answer": 2
+    },
+    {
+      "question": "Возникновение государства франков (правитель Хлодвиг)",
+      "options": ["450-е", "480-е", "510-е", "530-е"],
+      "answer": 1
+    },
+    {
+      "question": "Правление Юстиниана в Византийской империи",
+      "options": ["482-511", "527-565", "565-578", "610-641"],
+      "answer": 1
+    },
+    {
+      "question": "Возникновение ислама (первые откровения пророка Мухаммеда; хиджра)",
+      "options": ["570 / 579", "610 / 622", "632 / 644", "661 / 680"],
+      "answer": 1
+    },
+    {
+      "question": "Возникновение государства у арабов (Арабский халифат)",
+      "options": ["570", "610", "632", "661"],
+      "answer": 2
+    },
+    {
+      "question": "Провозглашение Карла Великого императором (создание Франкской империи)",
+      "options": ["768", "800", "843", "962"],
+      "answer": 1
+    },
+    {
+      "question": "Распад Франкской империи (Верденский раздел)",
+      "options": ["768", "800", "843", "962"],
+      "answer": 2
+    },
+    {
+      "question": "Образование Священной Римской империи (Первого рейха)",
+      "options": ["800", "843", "962", "1066"],
+      "answer": 2
+    },
+    {
+      "question": "Разделение христианской церкви на Восточную (православную) и Западную (католическую)",
+      "options": ["867", "962", "1054", "1096"],
+      "answer": 2
+    },
+    {
+      "question": "Нормандское завоевание Англии (битва при Гастингсе)",
+      "options": ["871", "1066", "1215", "1337"],
+      "answer": 1
+    },
+    {
+      "question": "Крестовые походы",
+      "options": ["1037 - 1125", "1096 - первая половина 1270-х / 1291", "1147 - 1242", "1204 - 1291"],
+      "answer": 1
+    },
+    {
+      "question": "Захват Константинополя крестоносцами (IV Крестовый поход)",
+      "options": ["1096", "1147", "1204", "1291"],
+      "answer": 2
+    },
+    {
+      "question": "Принятие Великой хартии вольности в Англии",
+      "options": ["1066", "1215", "1265", "1302"],
+      "answer": 1
+    },
+    {
+      "question": "Возникновение Английского парламента",
+      "options": ["1066", "1215", "1265", "1302"],
+      "answer": 2
+    },
+    {
+      "question": "Созыв Генеральных штатов во Франции",
+      "options": ["1215", "1265", "1302", "1358"],
+      "answer": 2
+    },
+    {
+      "question": "Столетняя война",
+      "options": ["1066-1154", "1154-1189", "1337-1453", "1455-1485"],
+      "answer": 2
+    },
+    {
+      "question": "Жакерия во Франции",
+      "options": ["1265", "1302", "1358", "1381"],
+      "answer": 2
+    },
+    {
+      "question": "Восстание под предводительством Уота Тайлера в Англии",
+      "options": ["1265", "1302", "1358", "1381"],
+      "answer": 3
+    },
+    {
+      "question": "Битва на Косовом поле (поражение Сербии от турок-османов)",
+      "options": ["1265", "1302", "1358", "1389"],
+      "answer": 3
+    },
+    {
+      "question": "Гуситские войны",
+      "options": ["1302-1328", "1337-1453", "1419-1434", "1455-1485"],
+      "answer": 2
+    },
+    {
+      "question": "Изобретение книгопечатания Иоганном Гутенбергом",
+      "options": ["1300 – 1320-е", "1350 – 1370-е", "1440 – 1450-е", "1490 – 1510-е"],
+      "answer": 2
+    },
+    {
+      "question": "Война Алой и Белой розы в Англии",
+      "options": ["1337-1453", "1419-1434", "1455-1485", "1461-1483"],
+      "answer": 2
+    },
+    {
+      "question": "Правление Людовика XI во Франции",
+      "options": ["1429-1461", "1461-1483", "1485-1509", "1492-1519"],
+      "answer": 1
+    },
+    {
+      "question": "Падение Византийской империи (захват Константинополя турками-османами)",
+      "options": ["1204", "1261", "1389", "1453"],
+      "answer": 3
+    },
+    {
+      "question": "Правление Генриха VII в Англии (1-й король из династии Тюдоров)",
+      "options": ["1429-1461", "1461-1483", "1485-1509", "1509-1547"],
+      "answer": 2
+    },
+    {
+      "question": "Открытие Америки Христофором Колумбом",
+      "options": ["1453", "1485", "1492", "1498"],
+      "answer": 2
+    },
+    {
+      "question": "Завершение Реконкисты на Пиренейском полуострове",
+      "options": ["1453", "1485", "1492", "1517"],
+      "answer": 2
+    },
+    {
+      "question": "Открытие Васко да Гамой морского пути в Индию",
+      "options": ["1485-1487", "1492-1493", "1497-1499", "1519-1522"],
+      "answer": 2
+    },
+    {
+      "question": "Выступление Мартина Лютера с 95 тезисами, начало Реформации в Германии",
+      "options": ["1485", "1492", "1517", "1521"],
+      "answer": 2
+    },
+    {
+      "question": "Кругосветное плавание экспедиции Фернана Магеллана",
+      "options": ["1492-1493", "1497-1499", "1519-1522", "1524-1525"],
+      "answer": 2
+    },
+    {
+      "question": "Вормсский рейхстаг. Осуждение М. Лютера",
+      "options": ["1517", "1521", "1524", "1555"],
+      "answer": 1
+    },
+    {
+      "question": "Крестьянская война в Германии",
+      "options": ["1517-1521", "1521-1525", "1524-1525 (1526)", "1534-1545"],
+      "answer": 2
+    },
+    {
+      "question": "Начало Реформации в Англии (король Генрих VIII)",
+      "options": ["1517", "1521", "1534", "1555"],
+      "answer": 2
+    },
+    {
+      "question": "Аугсбургский религиозный мир",
+      "options": ["1517", "1521", "1534", "1555"],
+      "answer": 3
+    },
+    {
+      "question": "Религиозные войны во Франции (между католиками и гугенотами)",
+      "options": ["1517-1555", "1534-1588", "1562-1598", "1588-1598"],
+      "answer": 2
+    },
+    {
+      "question": "Освободительная война в Нидерландах (80-летняя война)",
+      "options": ["1492-1519", "1519-1556", "1566-1609, 1621 - 1648", "1618-1648"],
+      "answer": 2
+    },
+    {
+      "question": "Образование Речи Посполитой",
+      "options": ["1492", "1525", "1569", "1618"],
+      "answer": 2
+    },
+    {
+      "question": "Варфоломеевская ночь во Франции",
+      "options": ["1534", "1562", "1572", "1598"],
+      "answer": 2
+    },
+    {
+      "question": "Утрехтская уния (объединение северных провинций Нидерландов)",
+      "options": ["1566", "1572", "1579", "1588"],
+      "answer": 2
+    },
+    {
+      "question": "Разгром Англией Непобедимой армады",
+      "options": ["1566", "1572", "1579", "1588"],
+      "answer": 3
+    },
+    {
+      "question": "Нантский эдикт Генриха IV во Франции",
+      "options": ["1572", "1579", "1588", "1598"],
+      "answer": 3
+    },
+    {
+      "question": "Тридцатилетняя война",
+      "options": ["1492-1522", "1566-1596", "1618-1648", "1700-1721"],
+      "answer": 2
+    },
+    {
+      "question": "Деятельность кардинала Ришелье на посту первого министра Франции",
+      "options": ["1589-1610", "1610-1643", "1624-1642", "1643-1715"],
+      "answer": 2
+    },
+    {
+      "question": "Начало деятельности Долгого парламента в Англии, начало Английской буржуазной революции",
+      "options": ["1588", "1624", "1640", "1649"],
+      "answer": 2
+    },
+    {
+      "question": "Принятие английским парламентом «Великой ремонстрации»",
+      "options": ["1624", "1640", "1641", "1649"],
+      "answer": 2
+    },
+    {
+      "question": "Гражданская война в Англии",
+      "options": ["1624-1629", "1640-1649", "1642-1649", "1649-1653"],
+      "answer": 2
+    },
+    {
+      "question": "Правление французского короля Людовика XIV",
+      "options": ["1610-1643", "1624-1642", "1643-1715", "1715-1774"],
+      "answer": 2
+    },
+    {
+      "question": "Вестфальский мир (завершил Тридцатилетнюю войну)",
+      "options": ["1618", "1640", "1648", "1649"],
+      "answer": 2
+    },
+    {
+      "question": "Казнь английского короля Карла I",
+      "options": ["1640", "1642", "1648", "1649"],
+      "answer": 3
+    },
+    {
+      "question": "Провозглашение Англии республикой",
+      "options": ["1640", "1642", "1649", "1653"],
+      "answer": 2
+    },
+    {
+      "question": "Протекторат Оливера Кромвеля",
+      "options": ["1642-1649", "1649-1653", "1653-1658", "1658-1660"],
+      "answer": 2
+    },
+    {
+      "question": "Реставрация династии Стюартов в Англии",
+      "options": ["1649", "1653", "1658", "1660"],
+      "answer": 3
+    },
+    {
+      "question": "«Славная революция» в Англии",
+      "options": ["1649", "1660", "1685", "1688"],
+      "answer": 3
+    },
+    {
+      "question": "Правление Людовика XV во Франции",
+      "options": ["1643-1715", "1715-1774", "1774-1792", "1792-1793"],
+      "answer": 1
+    },
+    {
+      "question": "Правление Фридриха II в Пруссии (Фридриха Великого)",
+      "options": ["1715-1774", "1740-1786", "1774-1792", "1786-1797"],
+      "answer": 1
+    },
+    {
+      "question": "Движение луддитов в Англии",
+      "options": ["1760-е", "1780-е", "1810-е", "1830-е"],
+      "answer": 2
+    },
+    {
+      "question": "«Бостонское чаепитие»",
+      "options": ["1765", "1773", "1775", "1776"],
+      "answer": 1
+    },
+    {
+      "question": "Принятие Декларации независимости США",
+      "options": ["1773", "1775", "1776", "1787"],
+      "answer": 2
+    },
+    {
+      "question": "Принятие конституции США",
+      "options": ["1775", "1776", "1787", "1791"],
+      "answer": 2
+    },
+    {
+      "question": "Начало революции во Франции (Великой Французской)",
+      "options": ["1776", "1787", "1789", "1792"],
+      "answer": 2
+    },
+    {
+      "question": "Принятие Декларации прав человека и гражданина (Франция)",
+      "options": ["1776", "1787", "1789", "1791"],
+      "answer": 2
+    },
+    {
+      "question": "Принятие Билля о правах в США",
+      "options": ["1776", "1787", "1789", "1791"],
+      "answer": 3
+    },
+    {
+      "question": "Президентство Дж. Вашингтона в США",
+      "options": ["1776-1783", "1789-1797", "1797-1801", "1801-1809"],
+      "answer": 1
+    },
+    {
+      "question": "Начало революционных войн Франции",
+      "options": ["1789", "1791", "1792", "1793"],
+      "answer": 2
+    },
+    {
+      "question": "Крушение монархии во Франции (арест короля Людовика XVI)",
+      "options": ["1789", "1791", "1792", "1793"],
+      "answer": 2
+    },
+    {
+      "question": "Приход к власти во Франции якобинцев",
+      "options": ["1789", "1791", "1792", "1793"],
+      "answer": 3
+    },
+    {
+      "question": "Казнь короля Людовика XVI во Франции",
+      "options": ["1789", "1791", "1792", "1793"],
+      "answer": 3
+    },
+    {
+      "question": "Итальянский поход Наполеона Бонапарта",
+      "options": ["1792-1793", "1793-1794", "1796-1797", "1798-1799"],
+      "answer": 2
+    },
+    {
+      "question": "Египетский поход Наполеона Бонапарта",
+      "options": ["1793-1794", "1796-1797", "1798", "1799"],
+      "answer": 2
+    },
+    {
+      "question": "Государственный переворот Наполеона Бонапарта 18–19 брюмера (становление первым консулом)",
+      "options": ["1796", "1798", "1799", "1804"],
+      "answer": 2
+    },
+    {
+      "question": "Провозглашение Наполеона императором Франции",
+      "options": ["1799", "1804", "1812", "1814"],
+      "answer": 1
+    },
+    {
+      "question": "Наполеоновские войны",
+      "options": ["1776-1783", "1792-1799", "1799-1815", "1812-1814"],
+      "answer": 2
+    },
+    {
+      "question": "Свержение Наполеона (первое отречение)",
+      "options": ["1799", "1812", "1814", "1815"],
+      "answer": 2
+    },
+    {
+      "question": "«Сто дней» Наполеона",
+      "options": ["1799-1800", "март-июнь 1815", "1812-1813", "1814-1815"],
+      "answer": 1
+    },
+    {
+      "question": "Провозглашение доктрины Монро в США",
+      "options": ["1776", "1787", "1815", "1823"],
+      "answer": 3
+    },
+    {
+      "question": "Июльская революция во Франции (2-я французская революция)",
+      "options": ["1789", "1792", "1799", "1830"],
+      "answer": 3
+    },
+    {
+      "question": "Чартистское движение в Англии",
+      "options": ["1760-1770-е", "1790-1800-е", "1830-1840-е", "1850-1860-е"],
+      "answer": 2
+    },
+    {
+      "question": "«Весна народов»: революции в европейских странах",
+      "options": ["1789-1799", "1830-1831", "1848-1849", "1870-1871"],
+      "answer": 2
+    },
+    {
+      "question": "Гражданская война в США",
+      "options": ["1775-1783", "1812-1815", "1861-1865", "1898"],
+      "answer": 2
+    },
+    {
+      "question": "Объединение Италии",
+      "options": ["1796-1797", "1815", "1861 (завершено в 1870)", "1870-1871"],
+      "answer": 2
+    },
+    {
+      "question": "Деятельность Бисмарка во главе Пруссии и Германии",
+      "options": ["1815-1848", "1848-1871", "1862-1890", "1871-1888"],
+      "answer": 2
+    },
+    {
+      "question": "Революция Мэйдзи в Японии",
+      "options": ["1853-1854", "1868-1889", "1894-1895", "1904-1905"],
+      "answer": 1
+    },
+    {
+      "question": "Франко-прусская война",
+      "options": ["1853-1856", "1861-1865", "1870-1871", "1914-1918"],
+      "answer": 2
+    },
+    {
+      "question": "Провозглашение Германской империи (образование Второго рейха)",
+      "options": ["1848", "1861", "1871", "1882"],
+      "answer": 2
+    },
+    {
+      "question": "Создание Тройственного союза (Германия, Австро-Венгрия, Италия)",
+      "options": ["1861", "1871", "1882", "1907"],
+      "answer": 2
+    },
+    {
+      "question": "Создание Антанты (Россия, Англия, Франция)",
+      "options": ["1882", "1891-1893", "1904-1907", "1914"],
+      "answer": 2
+    },
+    {
+      "question": "Балканские войны",
+      "options": ["1877-1878", "1904-1905", "1912, 1913", "1914-1918"],
+      "answer": 2
+    },
+    {
+      "question": "«Сараевский инцидент», убийство эрцгерцога Франца Фердинанда",
+      "options": ["28 июня 1914", "1 августа 1914", "11 ноября 1918", "28 июля 1919"],
+      "answer": 0
+    },
+    {
+      "question": "Первая мировая война",
+      "options": ["1870-1871", "1904-1905", "1914-1918", "1939-1945"],
+      "answer": 2
+    },
+    {
+      "question": "Ноябрьская революция в Германии (падение Второго рейха)",
+      "options": ["Август 1914", "Ноябрь 1918 – август 1919", "Январь 1919", "Январь 1933"],
+      "answer": 1
+    },
+    {
+      "question": "Парижская мирная конференция (подписание Версальского договора)",
+      "options": ["Ноябрь 1918", "Январь 1919 – январь 1920", "Ноябрь 1921", "Январь 1933"],
+      "answer": 1
+    },
+    {
+      "question": "Учреждение Лиги Наций",
+      "options": ["1914", "1917", "1919", "1922"],
+      "answer": 2
+    },
+    {
+      "question": "Вашингтонская конференция",
+      "options": ["1914-1918", "1919-1920", "Ноябрь 1921 – февраль 1922", "1929-1933"],
+      "answer": 2
+    },
+    {
+      "question": "Приход фашистов к власти в Италии (Б. Муссолини)",
+      "options": ["1914", "1917", "1922", "1933"],
+      "answer": 2
+    },
+    {
+      "question": "Мировой экономический кризис, «великая депрессия»",
+      "options": ["1914-1918", "1922-1926", "1929-1933", "1939-1945"],
+      "answer": 2
+    },
+    {
+      "question": "Приход Гитлера к власти в Германии (образование Третьего рейха)",
+      "options": ["Ноябрь 1918", "Январь 1919", "Январь 1933", "Сентябрь 1939"],
+      "answer": 2
+    },
+    {
+      "question": "«Новый курс» Ф. Рузвельта в США",
+      "options": ["1914-1918", "1929-1933", "1933-1936", "1939-1945"],
+      "answer": 2
+    },
+    {
+      "question": "Фашистский мятеж и гражданская война в Испании",
+      "options": ["1929-1933", "1933-1936", "1936-1939", "1939-1945"],
+      "answer": 2
+    },
+    {
+      "question": "Антикоминтерновский пакт Германии и Японии",
+      "options": ["1922", "1933", "1936", "1939"],
+      "answer": 2
+    },
+    {
+      "question": "Война США во Вьетнаме (поддержка США прозападного правительства Южного Вьетнама в борьбе с просоветским Северным Вьетнамом - Вьетконгом)",
+      "options": ["1946−1954", "1950−1953", "1965−1973", "1979−1989"],
+      "answer": 2
+    },
+    {
+      "question": "Захват Австрии нацистской Германией",
+      "options": ["1933", "1936", "1938", "1939"],
+      "answer": 2
+    },
+    {
+      "question": "Подписание Мюнхенского соглашения",
+      "options": ["Январь 1933", "Август 1939", "Сентябрь 1938", "Июнь 1941"],
+      "answer": 2
+    },
+    {
+      "question": "Вторая мировая война",
+      "options": ["1914-1918", "1936-1939", "1 сентября 1939 – 2 сентября 1945", "1939-1941"],
+      "answer": 2
+    },
+    {
+      "question": "Японская атака на Пёрл-Харбор и вступление США в войну",
+      "options": ["1 сентября 1939", "22 июня 1941", "7 декабря 1941", "6 июня 1944"],
+      "answer": 2
+    },
+    {
+      "question": "Высадка англо-американских войск в Нормандии. Открытие Второго фронта",
+      "options": ["7 декабря 1941", "2 февраля 1943", "6 июня 1944", "9 мая 1945"],
+      "answer": 2
+    },
+    {
+      "question": "Атомная бомбардировка Хиросимы и Нагасаки",
+      "options": ["6, 9 августа 1945", "2 сентября 1945", "9 мая 1945", "6 июня 1944"],
+      "answer": 0
+    },
+    {
+      "question": "Капитуляция Японии. Окончание Второй мировой войны",
+      "options": ["6, 9 августа 1945", "2 сентября 1945", "9 мая 1945", "6 июня 1944"],
+      "answer": 1
+    },
+    {
+      "question": "Нюрнбергский процесс над нацистскими преступниками",
+      "options": ["2 сентября 1945", "20 ноября 1945 – 1 октября 1946", "9 мая 1945", "6 июня 1944"],
+      "answer": 1
+    },
+    {
+      "question": "Образование НАТО",
+      "options": ["1945", "1947", "1949", "1955"],
+      "answer": 2
+    },
+    {
+      "question": "Провозглашение Китайской Народной Республики",
+      "options": ["1945", "1947", "1949", "1953"],
+      "answer": 2
+    },
+    {
+      "question": "Победа революции на Кубе",
+      "options": ["1945", "1949", "1956", "1959"],
+      "answer": 3
+    },
+    {
+      "question": "Бархатные революции в странах Центральной и Восточной Европы",
+      "options": ["1968", "1979", "1989", "1991"],
+      "answer": 2
+    },
+    {
+      "question": "Объединение ГДР и ФРГ",
+      "options": ["1949", "1961", "1989", "1990"],
+      "answer": 3
+    },
+    {
+      "question": "«Культурная революция» в Китае (серия идеологических кампаний для укрепления положения лидера Китая – Мао Цзэдуна и обеспечения преемственности его власти)", 
+      "options": ["1966−1976", "1961-1969", "1989-1995", "1927-1935"],
+      "answer": 0
+    }
+            ]
+        };
+
+        // Элементы DOM
+        const tabs = document.querySelectorAll('.tab');
+        const previewTab = document.getElementById('preview-tab');
+        const testTab = document.getElementById('test-tab');
+        const statsTab = document.getElementById('stats-tab');
+        const startTestBtn = document.getElementById('start-test-btn');
+        const checkAnswerBtn = document.getElementById('check-answer-btn');
+        const nextQuestionBtn = document.getElementById('next-question-btn');
+        const resultMessage = document.getElementById('result-message');
+        const correctAnswer = document.getElementById('correct-answer');
+        const previewList = document.getElementById('preview-list');
+        const historyTableBody = document.getElementById('history-table-body');
+        const blockInfo = document.getElementById('block-info');
+        const optionsContainer = document.getElementById('options-container');
+        const currentSessionScoreEl = document.getElementById('current-session-score');
+        const streakCounterEl = document.getElementById('streak-counter');
+
+        // Статистические элементы
+        const totalCardsEl = document.getElementById('total-cards');
+        const masteredCardsEl = document.getElementById('mastered-cards');
+        const currentScoreEl = document.getElementById('current-score');
+        const dueTodayEl = document.getElementById('due-today');
+        const progressEl = document.getElementById('progress');
+        const progressText = document.getElementById('progress-text');
+
+        // Элементы карточек
+        const testQuestion = document.getElementById('test-question');
+
+        // Переменные состояния
+        let currentCardIndex = 0;
+        let sessionCards = [];
+        let allCards = [];
+        let selectedOption = null;
+        let currentSessionScore = 0;
+        let currentStreak = 0;
+        let currentCorrectAnswerIndex = 0;
+        let userStats = {
+            totalCards: 0,
+            masteredCards: 0,
+            currentScore: 0,
+            dueToday: 0,
+            studyHistory: []
+        };
+
+        // Создание текущего блока из вопросов с наименьшими баллами
+        function createCurrentBlock() {
+            const now = new Date();
+            
+            // Фильтруем карточки, которые готовы к повторению
+            let availableCards = allCards.filter(card => 
+                !card.nextReview || new Date(card.nextReview) <= now
+            );
+            
+            // Если все карточки имеют 5 баллов, НЕ обнуляем их, а показываем сообщение
+            if (availableCards.length === 0 && allCards.every(card => card.score >= 5)) {
+                // Показываем сообщение об успехе
+                const successMessage = document.createElement('div');
+                successMessage.className = 'success-message';
+                successMessage.textContent = '🎉 Поздравляем! Вы выучили все вопросы!';
+                previewList.parentNode.insertBefore(successMessage, previewList);
+                
+                // Возвращаем все карточки для повторения
+                availableCards = [...allCards];
+            }
+            
+            // Если нет доступных карточек, берем новые (с баллом 0)
+            if (availableCards.length === 0) {
+                availableCards = allCards.filter(card => card.score === 0);
+            }
+            
+            // Сортируем по баллам (от меньшего к большему)
+            availableCards.sort((a, b) => a.score - b.score);
+            
+            // Берем первые 10 карточек (с наименьшими баллами)
+            return availableCards.slice(0, 10);
+        }
+
+        // Загрузка данных
+        function loadData() {
+            console.log('🔄 Загружаю встроенные данные...');
+            const cardsDatabase = fullQuestionsDatabase.questions;
+            
+            // Загружаем сохраненные данные
+            loadSavedData(cardsDatabase);
+        }
+
+        // Загрузка сохраненных данных
+        function loadSavedData(cardsDatabase) {
+            const savedCards = localStorage.getItem('historyCards');
+            const savedStats = localStorage.getItem('historyStats');
+            
+            // Загружаем все карточки
+            allCards = cardsDatabase.map((card, index) => ({
+                id: index + 1,
+                question: card.question,
+                originalOptions: card.options,
+                originalAnswer: card.answer,
+                score: 0,
+                lastReviewed: null,
+                nextReview: new Date()
+            }));
+            
+            if (savedCards) {
+                try {
+                    const savedCardsData = JSON.parse(savedCards);
+                    // Обновляем вопросы из базы данных
+                    savedCardsData.forEach(savedCard => {
+                        const dbCard = allCards.find(c => c.question === savedCard.question);
+                        if (dbCard) {
+                            dbCard.score = savedCard.score || 0;
+                            dbCard.lastReviewed = savedCard.lastReviewed;
+                            if (savedCard.nextReview) {
+                                dbCard.nextReview = new Date(savedCard.nextReview);
+                            }
+                        }
+                    });
+                    console.log('✅ Загружены сохраненные данные карточек');
+                } catch (e) {
+                    console.error('Ошибка при загрузке сохраненных карточек:', e);
+                }
+            }
+            
+            if (savedStats) {
+                try {
+                    const parsedStats = JSON.parse(savedStats);
+                    userStats = {
+                        ...userStats,
+                        ...parsedStats,
+                        studyHistory: parsedStats.studyHistory || []
+                    };
+                    console.log('✅ Загружена статистика');
+                } catch (e) {
+                    console.error('Ошибка при загрузке статистики:', e);
+                }
+            }
+            
+            updateStats();
+            updateHistoryTable();
+            initSession();
+        }
+
+        // Сохранение данных
+        function saveCards() {
+            try {
+                localStorage.setItem('historyCards', JSON.stringify(allCards));
+            } catch (e) {
+                console.error('Ошибка при сохранении карточек:', e);
+            }
+        }
+
+        function saveStats() {
+            try {
+                localStorage.setItem('historyStats', JSON.stringify(userStats));
+            } catch (e) {
+                console.error('Ошибка при сохранении статистики:', e);
+            }
+        }
+
+        // Обновление статистики
+        function updateStats() {
+            const now = new Date();
+            const dueCards = allCards.filter(card => 
+                !card.nextReview || new Date(card.nextReview) <= now
+            );
+            
+            const masteredCards = allCards.filter(card => card.score >= 5).length;
+            const totalScore = allCards.reduce((sum, card) => sum + (card.score || 0), 0);
+            
+            userStats.totalCards = allCards.length;
+            userStats.masteredCards = masteredCards;
+            userStats.currentScore = totalScore;
+            userStats.dueToday = dueCards.length;
+            
+            totalCardsEl.textContent = userStats.totalCards;
+            masteredCardsEl.textContent = userStats.masteredCards;
+            currentScoreEl.textContent = userStats.currentScore;
+            dueTodayEl.textContent = userStats.dueToday;
+            
+            saveStats();
+        }
+
+        // Обновление таблицы истории
+        function updateHistoryTable() {
+            historyTableBody.innerHTML = '';
+            
+            if (!userStats.studyHistory || userStats.studyHistory.length === 0) {
+                historyTableBody.innerHTML = `
+                    <tr>
+                        <td colspan="4" class="empty-message">
+                            Пока нет данных о занятиях
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+            
+            // Сортируем от новых к старым
+            const sortedHistory = [...userStats.studyHistory].sort((a, b) => 
+                new Date(b.date) - new Date(a.date)
+            );
+            
+            sortedHistory.forEach(session => {
+                const date = new Date(session.date);
+                const formattedDate = date.toLocaleDateString('ru-RU');
+                
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${formattedDate}</td>
+                    <td>${session.totalQuestions || 0}</td>
+                    <td class="correct-count">${session.correctAnswers || 0}</td>
+                    <td class="incorrect-count">${session.incorrectAnswers || 0}</td>
+                `;
+                historyTableBody.appendChild(row);
+            });
+        }
+
+        // Добавление записи в историю
+        function addStudySession(totalQuestions, correctAnswers, incorrectAnswers) {
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            
+            if (!userStats.studyHistory) {
+                userStats.studyHistory = [];
+            }
+            
+            const existingSessionIndex = userStats.studyHistory.findIndex(session => {
+                const sessionDate = new Date(session.date);
+                sessionDate.setHours(0, 0, 0, 0);
+                return sessionDate.getTime() === today.getTime();
+            });
+            
+            const sessionData = {
+                date: today,
+                totalQuestions: totalQuestions || 0,
+                correctAnswers: correctAnswers || 0,
+                incorrectAnswers: incorrectAnswers || 0
+            };
+            
+            if (existingSessionIndex !== -1) {
+                userStats.studyHistory[existingSessionIndex] = sessionData;
+            } else {
+                userStats.studyHistory.push(sessionData);
+            }
+            
+            saveStats();
+            updateHistoryTable();
+        }
+
+        // Инициализация сессии
+        function initSession() {
+            currentCardIndex = 0;
+            currentSessionScore = 0;
+            currentStreak = 0;
+            sessionCards = createCurrentBlock();
+            updatePreviewList();
+            updateSessionScore();
+            
+            // Активируем кнопки если есть карточки
+            if (sessionCards.length > 0) {
+                startTestBtn.disabled = false;
+                nextQuestionBtn.disabled = false;
+            }
+        }
+
+        // Обновление списка предпросмотра для текущего блока
+        function updatePreviewList() {
+            previewList.innerHTML = '';
+            
+            // Убираем предыдущие сообщения об успехе
+            const successMessages = document.querySelectorAll('.success-message');
+            successMessages.forEach(msg => msg.remove());
+            
+            if (sessionCards.length === 0) {
+                previewList.innerHTML = '<div class="empty-message">Нет карточек для изучения на сегодня</div>';
+                startTestBtn.disabled = true;
+                blockInfo.textContent = 'Нет карточек для изучения';
+                return;
+            }
+            
+            startTestBtn.disabled = false;
+            
+            // Обновляем информацию о блоке
+            const minScore = Math.min(...sessionCards.map(card => card.score || 0));
+            const maxScore = Math.max(...sessionCards.map(card => card.score || 0));
+            blockInfo.textContent = `Вопросы с баллами от ${minScore} до ${maxScore} (всего: ${sessionCards.length})`;
+            
+            sessionCards.forEach(card => {
+                const item = document.createElement('div');
+                item.className = 'preview-item';
+                item.innerHTML = `
+                    <div class="preview-question">${card.question}</div>
+                    <div class="preview-answer">
+                        ${card.originalOptions[card.originalAnswer]}
+                        <span class="score-badge">${card.score || 0}/5</span>
+                    </div>
+                `;
+                previewList.appendChild(item);
+            });
+        }
+
+        // Начать тестирование текущего блока
+        function startTest() {
+            if (sessionCards.length === 0) return;
+            
+            currentCardIndex = 0;
+            currentSessionScore = 0;
+            currentStreak = 0;
+            tabs[1].click();
+        }
+
+        // Показать карточку для тестирования
+        function showTestCard() {
+            if (currentCardIndex >= sessionCards.length) {
+                // Завершаем сессию и добавляем в историю
+                const correctAnswers = sessionCards.filter(card => (card.score || 0) > 0).length;
+                const incorrectAnswers = sessionCards.length - correctAnswers;
+                addStudySession(sessionCards.length, correctAnswers, incorrectAnswers);
+                
+                // Переходим на вкладку просмотра
+                tabs[0].click();
+                initSession();
+                return;
+            }
+            
+            const card = sessionCards[currentCardIndex];
+            testQuestion.textContent = card.question;
+            
+            // Очищаем контейнер опций
+            optionsContainer.innerHTML = '';
+            selectedOption = null;
+            
+            // Перемешиваем варианты ответов
+            const shuffledOptions = shuffleArray([...card.originalOptions]);
+            
+            // Находим новый индекс правильного ответа после перемешивания
+            currentCorrectAnswerIndex = shuffledOptions.findIndex(option => 
+                option === card.originalOptions[card.originalAnswer]
+            );
+            
+            // Создаем кнопки опций
+            shuffledOptions.forEach((option, index) => {
+                const optionBtn = document.createElement('button');
+                optionBtn.className = 'option-btn';
+                optionBtn.textContent = option;
+                optionBtn.dataset.index = index;
+                
+                optionBtn.addEventListener('click', () => {
+                    // Снимаем выделение с предыдущей опции
+                    document.querySelectorAll('.option-btn').forEach(btn => {
+                        btn.classList.remove('selected');
+                    });
+                    
+                    // Выделяем текущую опцию
+                    optionBtn.classList.add('selected');
+                    selectedOption = index;
+                    
+                    // Показываем кнопку проверки
+                    checkAnswerBtn.style.display = 'block';
+                    nextQuestionBtn.style.display = 'none';
+                });
+                
+                optionsContainer.appendChild(optionBtn);
+            });
+            
+            resultMessage.style.display = 'none';
+            correctAnswer.style.display = 'none';
+            checkAnswerBtn.style.display = 'none';
+            nextQuestionBtn.style.display = 'block';
+            
+            updateProgress();
+        }
+
+        // Проверка ответа
+        function checkAnswer() {
+            if (selectedOption === null) return;
+            
+            const card = sessionCards[currentCardIndex];
+            const isCorrect = selectedOption === currentCorrectAnswerIndex;
+            
+            // Показываем правильные/неправильные ответы
+            document.querySelectorAll('.option-btn').forEach((btn, index) => {
+                btn.classList.remove('selected');
+                if (index === currentCorrectAnswerIndex) {
+                    btn.classList.add('correct');
+                } else if (index === selectedOption && !isCorrect) {
+                    btn.classList.add('incorrect');
+                }
+            });
+            
+            resultMessage.style.display = 'block';
+            resultMessage.className = `result-message ${isCorrect ? 'result-correct' : 'result-incorrect'}`;
+            resultMessage.textContent = isCorrect ? '✓ Правильно!' : '✗ Неправильно!';
+            
+            if (!isCorrect) {
+                const correctAnswerText = card.originalOptions[card.originalAnswer];
+                correctAnswer.textContent = `Правильный ответ: ${correctAnswerText}`;
+                correctAnswer.style.display = 'block';
+            }
+            
+            // Обновляем баллы карточки
+            const currentScore = card.score || 0;
+            if (isCorrect) {
+                card.score = Math.min(5, currentScore + 1);
+                currentSessionScore += 1;
+                currentStreak += 1;
+            } else {
+                card.score = Math.max(0, currentScore - 1);
+                currentSessionScore = Math.max(0, currentSessionScore - 1);
+                currentStreak = 0;
+            }
+            
+            // Обновляем серийные ответы
+            if (currentStreak > 1) {
+                streakCounterEl.textContent = `Серия: ${currentStreak}`;
+                streakCounterEl.style.display = 'inline-block';
+            } else {
+                streakCounterEl.style.display = 'none';
+            }
+            
+            // Устанавливаем следующее повторение
+            const now = new Date();
+            const nextDate = new Date(now);
+            nextDate.setDate(nextDate.getDate() + (isCorrect ? 3 : 1));
+            card.nextReview = nextDate;
+            card.lastReviewed = now;
+            
+            // Обновляем карточку в основном массиве
+            const mainCard = allCards.find(c => c.question === card.question);
+            if (mainCard) {
+                mainCard.score = card.score;
+                mainCard.nextReview = card.nextReview;
+                mainCard.lastReviewed = card.lastReviewed;
+            }
+            
+            saveCards();
+            updateStats();
+            updateSessionScore();
+            
+            checkAnswerBtn.style.display = 'none';
+            nextQuestionBtn.style.display = 'block';
+        }
+
+        // Переход к следующему вопросу
+        function nextQuestion() {
+            currentCardIndex++;
+            showTestCard();
+        }
+
+        // Обновление прогресса
+        function updateProgress() {
+            const progress = ((currentCardIndex) / sessionCards.length) * 100;
+            progressEl.style.width = `${progress}%`;
+            progressText.textContent = `${currentCardIndex}/${sessionCards.length}`;
+        }
+
+        // Обновление счета сессии
+        function updateSessionScore() {
+            currentSessionScoreEl.textContent = currentSessionScore;
+        }
+
+        // Инициализация приложения
+        function init() {
+            // Обработчики вкладок
+            tabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    const tabName = tab.dataset.tab;
+                    
+                    tabs.forEach(t => t.classList.remove('active'));
+                    tab.classList.add('active');
+                    
+                    previewTab.classList.toggle('hidden', tabName !== 'preview');
+                    testTab.classList.toggle('hidden', tabName !== 'test');
+                    statsTab.classList.toggle('hidden', tabName !== 'stats');
+                    
+                    if (tabName === 'test') {
+                        currentCardIndex = 0;
+                        currentSessionScore = 0;
+                        currentStreak = 0;
+                        showTestCard();
+                        updateSessionScore();
+                    } else if (tabName === 'preview') {
+                        initSession();
+                    }
+                });
+            });
+
+            // Обработчики кнопок
+            startTestBtn.addEventListener('click', startTest);
+            checkAnswerBtn.addEventListener('click', checkAnswer);
+            nextQuestionBtn.addEventListener('click', nextQuestion);
+            
+            // Загрузка данных
+            loadData();
+        }
+
+        // Запуск приложения
+        init();
+    </script>
+</body>
+</html>
